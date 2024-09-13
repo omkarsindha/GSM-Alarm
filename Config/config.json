@@ -1,0 +1,7 @@
+{
+    "max_temp": 30,
+    "hysteresis": 5,
+    "password": 1234,
+    "report_interval": 60,
+    "message": "Alert from GSM Alarm\n\nTemperature is above threshold"
+}
