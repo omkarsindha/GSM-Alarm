@@ -1,7 +1,7 @@
 import os
 import json
 
-def write_history(filepath, message, temp, date):
+def write_history(message, temp, date, filepath="Config/past-alerts.json"):
     history_entry = {
         "message": message,
         "temperature": temp,
@@ -21,5 +21,3 @@ def write_history(filepath, message, temp, date):
 
     with open(filepath, "w") as file:
         json.dump(history_data, file, indent=4)
-
-    print(f"History written: {history_entry}")
