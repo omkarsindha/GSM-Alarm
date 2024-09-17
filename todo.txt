@@ -1,0 +1,5 @@
+Figure out how to send emoji over text    - Done
+NTP time  done
+SMS Reply backs
+when to send daily status
+numbers from json file

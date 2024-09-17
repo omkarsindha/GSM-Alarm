@@ -17,10 +17,11 @@ class LabMonitor(threading.Thread):
         self.last_msg_time = time.time() - self.config.report_interval
         self.debug = debug
         self.end_event = threading.Event()
-        self.sms_thread = SIM7600x(debug)
+        self.sms_thread = SIM7600x(debug=debug)
         self.sms_thread.start()
+        self.lock = threading.Lock()
+        self.log("Initiated an instance of monitor thread")
         
-    
     def run(self):
         try:
             self.monitor_loop()
@@ -28,11 +29,11 @@ class LabMonitor(threading.Thread):
             error = str(err) if str(err) else str(err.__class__.__name__)
             self.log("Thread failed: %s" % error)
             self.error = "Unhandled exception: %s" % error
-    
-    
+
     def monitor_loop(self):
         while self.end_event.is_set() is False:
-            temp = self.sensor.read_temp()
+            with self.lock:
+                temp = self.sensor.read_temp()
             current_time = time.time()
             if temp is not None:
                 self.log(f"Current Temperature: {temp}°C")
@@ -43,8 +44,7 @@ class LabMonitor(threading.Thread):
                     write_history(self.config.message, temp, current_time)
             else:
                 self.log("Error reading temprature")   
-            time.sleep(self.check_interval)
-        
+            time.sleep(self.check_interval) 
         
     def log(self, message):
         if self.debug:
@@ -56,6 +56,17 @@ class LabMonitor(threading.Thread):
         self.sms_thread.stop()
         if block is True:
             self.join()
+            
+    def get_config(self):
+        with self.lock:
+            current_temp = self.sensor.read_temp()
+            numbers = self.config.numbers
+        return current_temp,numbers
+    
+    
+            
+                
+        
     
     
 if __name__ == "__main__":
