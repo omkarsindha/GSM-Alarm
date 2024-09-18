@@ -35,8 +35,8 @@ class SIM7600x(threading.Thread):
     
     def enqueue_sms(self, numbers, message, temp):
         for number in numbers:
-            message = SMSMessage(number, message, temp)
-            self.sms_queue.put(message)
+            sms = SMSMessage(number, message, temp)
+            self.sms_queue.put(sms)
                  
     def sms_loop(self):
         while self.end_event.is_set() is False:
@@ -64,9 +64,8 @@ class SIM7600x(threading.Thread):
             rdble_time = time.strftime("%B %d %Y %H:%M:%S")
             msg = f"{message}\n\nTemprature: {temp} C \nTime: {rdble_time}"
             
-            self.log("Sending msg")
             self.ser.write((msg + '\x1A').encode())
-            time.sleep(2)
+            time.sleep(3)
             response = self.ser.read(self.ser.in_waiting).decode()
             if "+CMGS:" in response:
                 self.log(f"Message sent successfully")
@@ -74,9 +73,10 @@ class SIM7600x(threading.Thread):
             else:
                 self.log(f"Failed to send message")
                 return False
-        
+            self.factory_reset()
         except Exception as e:
             self.log(f"Failed to send message: {e}")
+            self.factory_reset()
                             
     def send_at_command(self, command, expected, timeout=1, retries=3):
         self.log(f"Currently running Command: {command}")
@@ -111,7 +111,7 @@ class SIM7600x(threading.Thread):
         self.end_event.set()
         if self.ser.is_open:
             self.ser.close()
-            self.log("Serial POrt is now closed")
+            self.log("Serial Port is now closed")
         if block is True:
             self.join() 
                 
