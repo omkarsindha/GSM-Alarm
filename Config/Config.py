@@ -9,8 +9,9 @@ class Config:
         self.alert_interval = 0
         self.numbers = []
         self.numbers_list = []
-        self.message = 'Alert from GSM Alarm\n\nTemperature is above threshold'
-        
+        self.alert_msg = 'Alert from GSM Alarm\n\nTemperature is above threshold'
+        self.daily_msg = 'Daily Status Report\n'
+        self.daily_status_time = ''
         self.config_path = config_path
         self.numbers_path = numbers_path
         self.load_config()  
@@ -26,6 +27,7 @@ class Config:
         self.hysteresis = settings.get("hysteresis", self.hysteresis)
         self.password = settings.get("password", self.password)
         self.alert_interval = settings.get("alert_interval", self.alert_interval)
+        self.daily_status_time = settings.get("daily_status_time ", "17:00")
 
         with open(self.numbers_path, "r") as file:
             try:
@@ -33,10 +35,7 @@ class Config:
             except json.JSONDecodeError as e:
                 raise ValueError(f"Error parsing JSON file: {e}")
         self.numbers = [entry["number"] for entry in self.numbers_list]
-
-        
-
-
+     
 
 
 if __name__ == "__main__":
@@ -46,3 +45,4 @@ if __name__ == "__main__":
     print(f"Password: {config_loader.password}")
     print(f"Report Interval: {config_loader.alert_interval}")
     print(f"Numbers: {config_loader.numbers}")
+    print(f"Daily Stauts Time: {config_loader.daily_status_time}")

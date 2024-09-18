@@ -73,7 +73,7 @@ class SIM7600x(threading.Thread):
             else:
                 self.log(f"Failed to send message")
                 return False
-            self.factory_reset()
+            self.factory_reset
         except Exception as e:
             self.log(f"Failed to send message: {e}")
             self.factory_reset()
@@ -98,6 +98,7 @@ class SIM7600x(threading.Thread):
 
     def factory_reset(self):
         if self.send_at_command("AT&F", "OK"):
+            time.sleep(2)
             return
         else:
             self.send_at_command('\x1A','')
