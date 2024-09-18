@@ -14,7 +14,7 @@ class LabMonitor(threading.Thread):
         self.config = Config(config_path="Config/config.json")
         self.sensor = TemperatureSensor()
         self.check_interval = check_interval
-        self.last_msg_time = time.time() - self.config.report_interval
+        self.last_msg_time = time.time() - self.config.alert_interval
         self.debug = debug
         self.end_event = threading.Event()
         self.sms_thread = SIM7600x(debug=debug)
@@ -37,7 +37,7 @@ class LabMonitor(threading.Thread):
             current_time = time.time()
             if temp is not None:
                 self.log(f"Current Temperature: {temp}°C")
-                if temp > self.config.max_temp and (current_time - self.last_msg_time > self.config.report_interval):   
+                if temp > self.config.max_temp and (current_time - self.last_msg_time > self.config.alert_interval):   
                     self.last_msg_time = time.time()
                     self.log("Sending alert messages...")
                     self.sms_thread.enqueue_sms(self.config.numbers, self.config.message, temp)
@@ -58,15 +58,14 @@ class LabMonitor(threading.Thread):
             self.join()
             
     def get_config(self):
+        self.config = Config()
         with self.lock:
             current_temp = self.sensor.read_temp()
-            numbers = self.config.numbers
-        return current_temp,numbers
-    
-    
-            
-                
-        
+        numbers = self.config.numbers_list
+        max_temp = self.config.max_temp
+        hysteresis = self.config.hysteresis
+        alert_interval = self.config.alert_interval
+        return current_temp, max_temp, hysteresis, alert_interval, numbers
     
     
 if __name__ == "__main__":

@@ -38,5 +38,45 @@
         "message": "Alert from GSM Alarm\n\nTemperature is above threshold",
         "temperature": 30.625,
         "time": 1726593670.4912453
+    },
+    {
+        "message": "Alert from GSM Alarm\n\nTemperature is above threshold\"",
+        "temperature": 30.312,
+        "time": 1726672640.7708926
+    },
+    {
+        "message": "Alert from GSM Alarm\n\nTemperature is above threshold\"",
+        "temperature": 32.25,
+        "time": 1726676219.8377082
+    },
+    {
+        "message": "Alert from GSM Alarm\n\nTemperature is above threshold\"",
+        "temperature": 33.312,
+        "time": 1726676284.1548238
+    },
+    {
+        "message": "Alert from GSM Alarm\n\nTemperature is above threshold\"",
+        "temperature": 24.5,
+        "time": 1726677534.8428466
+    },
+    {
+        "message": "Alert from GSM Alarm\n\nTemperature is above threshold\"",
+        "temperature": 24.5,
+        "time": 1726677747.5149186
+    },
+    {
+        "message": "Alert from GSM Alarm\n\nTemperature is above threshold\"",
+        "temperature": 24.625,
+        "time": 1726678303.4508758
+    },
+    {
+        "message": "Alert from GSM Alarm\n\nTemperature is above threshold\"",
+        "temperature": 24.562,
+        "time": 1726678367.738899
+    },
+    {
+        "message": "Alert from GSM Alarm\n\nTemperature is above threshold\"",
+        "temperature": 24.312,
+        "time": 1726681819.5788665
     }
 ]

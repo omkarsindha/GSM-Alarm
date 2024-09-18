@@ -1,28 +1,52 @@
-from flask import request, jsonify, render_template
+from flask import request, jsonify, render_template, redirect, url_for
 from flask_app import app
-from main import get_monitor
+from monitor_instance import get_monitor
+from utils.file_utils import add_contact_to_file 
+from utils.file_utils import remove_number_by_index
+from utils.file_utils import update_config
 
-main = Blueprint('main', __name__)
 
-@main.route("/")
+
+@app.route("/")
 def home():
     return render_template("index.html")
 
-@main.route("/configure-alarm", methods=["POST"])
+@app.route("/configure-alarm", methods=["POST"])
 def start():
     data = request.get_json()
-    max_temp = float(data.get('max_temp'))
-    print(f"Max temp: {max_temp}")
-    return data
+    max_temp = data.get('max_temp')
+    hys = data.get('hys')
+    interval = data.get('interval')
+    if max_temp and hys and interval:
+        update_config(max_temp, hys, interval)
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False, "message": "Invalid data"}), 400
 
-@main.route("/sensor_status", methods=["GET"])
+
+@app.route("/sensor-config", methods=["GET"])
 def sensor_status():
     monitor = get_monitor()
-    print(monitor)
     if monitor is not None:
-        with monitor.lock:
-            temp, numbers = monitor.get_config()
-            print(numbers)
-        return jsonify({"temp": temp, "numbers": numbers})
+        temp, max_temp, hys, interval, numbers = monitor.get_config()
+        return jsonify({"temp": temp, "max_temp":max_temp, "hys": hys, "interval":interval, "numbers": numbers})
     else:
-        return jsonify({"status": "Monitor not started"}), 500
+        return jsonify({"message": "Monitor not started"}), 500
+    
+@app.route('/add-phone-number', methods=['POST'])
+def add_phone_number():
+    data = request.get_json()
+    name = data.get('name')
+    phone = data.get('phone')
+    if name and phone:
+        add_contact_to_file(name, phone)
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False, "message": "Invalid data"}), 400
+    
+@app.route('/delete-number/<int:index>', methods=['GET'])
+def delete_number(index):
+    if remove_number_by_index(index):
+        return redirect(url_for('home'))
+    else:
+        return "Index out of range", 404
