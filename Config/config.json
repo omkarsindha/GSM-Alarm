@@ -1,7 +1,7 @@
 {
-    "max_temp": 30,
+    "max_temp": 29,
     "hysteresis": 4,
     "password": 1234,
     "alert_interval": 62,
-    "daily-status": "14:30"
+    "daily_status_time ": "16:38"
 }

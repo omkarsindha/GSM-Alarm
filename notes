@@ -7,3 +7,6 @@ Problems I have had
 	6) Factory reset issues
     7) Flask app runs 2 times making 2 instance of monitor thread something related to debug being on or reloader when code is saved
     8) Shutting application down nicely
+
+	When u come in tmrw make the daily status time be configurable from the webpage
+	Implement histersis
