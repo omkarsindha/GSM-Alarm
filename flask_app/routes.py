@@ -4,7 +4,7 @@ from monitor_instance import get_monitor
 from utils.file_utils import add_contact_to_file 
 from utils.file_utils import remove_number_by_index
 from utils.file_utils import update_config
-
+from utils.utils import format_phone_number
 
 
 @app.route("/")
@@ -12,13 +12,14 @@ def home():
     return render_template("index.html")
 
 @app.route("/configure-alarm", methods=["POST"])
-def start():
+def configure_alarm():
     data = request.get_json()
     max_temp = data.get('max_temp')
     hys = data.get('hys')
     interval = data.get('interval')
-    if max_temp and hys and interval:
-        update_config(max_temp, hys, interval)
+    daily_report = data.get('daily_report')
+    if max_temp and hys and interval and daily_report:
+        update_config(max_temp, hys, interval, daily_report)
         return jsonify({"success": True})
     else:
         return jsonify({"success": False, "message": "Invalid data"}), 400
@@ -28,8 +29,8 @@ def start():
 def sensor_status():
     monitor = get_monitor()
     if monitor is not None:
-        temp, max_temp, hys, interval, numbers = monitor.get_config()
-        return jsonify({"temp": temp, "max_temp":max_temp, "hys": hys, "interval":interval, "numbers": numbers})
+        temp, max_temp, hys, interval, daily_report, numbers  = monitor.get_config()
+        return jsonify({"temp": temp, "max_temp":max_temp, "hys": hys, "interval":interval, "daily_report": daily_report , "numbers": numbers, })
     else:
         return jsonify({"message": "Monitor not started"}), 500
     
@@ -37,7 +38,8 @@ def sensor_status():
 def add_phone_number():
     data = request.get_json()
     name = data.get('name')
-    phone = data.get('phone')
+    phone = format_phone_number(data.get('phone'))
+    
     if name and phone:
         add_contact_to_file(name, phone)
         return jsonify({"success": True})

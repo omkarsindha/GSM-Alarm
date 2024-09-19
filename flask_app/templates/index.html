@@ -20,7 +20,7 @@
                         <th>Value</th>
                     </tr>
                     <tr>
-                        <td>Temperature</td>
+                        <td>Current Temperature</td>
                         <td id="lab-temperature">Loading...</td>
                     </tr>
                 </table>
@@ -31,27 +31,29 @@
             <div class="form-section">
                 <h2>Configure Alarm</h2>
                 <form id="config-form">
-                    <div class="input-group">
+
+                    <div class="input-group-grid">
                         <div class="input-field">
-                            <label for="max-temp">Max Temperature:</label>
-                            <input type="number" id="max-temp" name="max-temp" min="-50" max="50" placeholder="(°C)" ,
+                            <label for="max-temp">Max Temperature(°C):</label>
+                            <input type="number" id="max-temp" name="max-temp" min="-50" max="50" placeholder="(°C)"
                                 value="0" required>
                         </div>
                         <div class="input-field">
-                            <label for="hysteresis">Hysteresis:</label>
+                            <label for="hysteresis">Hysteresis(°C):</label>
                             <input type="number" id="hysteresis" name="hysteresis" min="-50" max="50" placeholder="(°C)"
-                                , value="0" required>
-                        </div>
-                        <div class="input-field">
-                            <label for="report-interval">Alert Interval:</label>
-                            <input type="number" id="report-interval" name="alert-interval" placeholder="(Seconds)" ,
                                 value="0" required>
                         </div>
                         <div class="input-field">
-                            <label for="report-interval">Daily report:</label>
-                            <input type="time" id="time-input" name="time-input" step="60" required>
+                            <label for="alert-interval">Alert Interval(minutes):</label>
+                            <input type="number" id="alert-interval" name="alert-interval" placeholder="(minutes)"
+                                value="0" required>
+                        </div>
+                        <div class="input-field">
+                            <label for="daily_report">Daily report:</label>
+                            <input type="time" id="daily-report" name="daily_report" step="60" required>
                         </div>
                     </div>
+
                     <button type="submit" class="button">Save Configuration</button>
                 </form>
             </div>
@@ -64,7 +66,7 @@
                     <div class="input-group">
                         <div class="input-field">
                             <input type="text" id="name" name="name" placeholder="Enter Name" required>
-                            <input type="tel" id="phone" name="phone" placeholder="Phone number (eg +14374293008)" required>
+                            <input type="tel" id="phone" name="phone" placeholder="Enter Phone number" required>
                         </div>
                     </div>
                     <button type="submit" class="button">Add Number</button>
