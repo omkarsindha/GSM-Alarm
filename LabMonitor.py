@@ -21,9 +21,10 @@ class LabMonitor(threading.Thread):
         self.sms_thread = SIM7600x(debug=debug)
         self.sms_thread.start()
         self.lock = threading.Lock()
-        self.log("Initiated an instance of monitor thread")
         self.schedule_daily_status()
-        
+        self.status = "GREEN"
+        self.log("Initiated an instance of monitor thread")
+         
     def run(self):
         try:
             self.monitor_loop()
@@ -39,7 +40,15 @@ class LabMonitor(threading.Thread):
             current_time = time.time()
             if temp is not None:
                 self.log(f"Current Temperature: {temp}°C")
-                if temp > self.config.max_temp and (current_time - self.last_msg_time > self.config.alert_interval):   
+                
+                if temp > self.config.max_temp:
+                    self.status = "RED"
+                    
+                if temp < self.config.max_temp-self.config.hysteresis and self.status == "RED":
+                    self.status = "GREEN"
+                    self.sms_thread.enqueue_sms(self.config.numbers, self.config.good_msg, temp)
+                    
+                if current_time - self.last_msg_time > self.config.alert_interval and self.status == "RED":   
                     self.last_msg_time = time.time()
                     self.log("Sending alert messages...")
                     self.sms_thread.enqueue_sms(self.config.numbers, self.config.alert_msg, temp)
@@ -63,21 +72,20 @@ class LabMonitor(threading.Thread):
             
     def get_config(self):
         self.config = Config()
+        self.update_daily_status_schedule()
         with self.lock:
             current_temp = self.sensor.read_temp()
         numbers = self.config.numbers_list
         max_temp = self.config.max_temp
         hysteresis = self.config.hysteresis
-        alert_interval = self.config.alert_interval
-        return current_temp, max_temp, hysteresis, alert_interval, numbers
+        alert_interval = self.config.alert_interval/60
+        daily_report = self.config.daily_report
+        return current_temp, max_temp, hysteresis, alert_interval, daily_report, numbers
     
     def schedule_daily_status(self):
-        try:
-            schedule.every().day.at(self.config.daily_status_time).do(self.send_daily_status)
-            self.log(f"Scheduled daily status for {self.config.daily_status_time}")
-        except Exception as e:
-            self.log(f"Error scheduling daily status: {str(e)}. Using default time 12:00.")
-            schedule.every().day.at("12:00").do(self.send_daily_status)
+        schedule.every().day.at(self.config.daily_report).do(self.send_daily_status)
+        self.log(f"Scheduled daily status for {self.config.daily_report}")
+    
 
     def send_daily_status(self):
         with self.lock:
@@ -85,6 +93,10 @@ class LabMonitor(threading.Thread):
         self.sms_thread.enqueue_sms(self.config.numbers, self.config.daily_msg, current_temp)
         self.log("Sent daily status message")
     
+    def update_daily_status_schedule(self):
+        schedule.clear('daily_status')
+        self.schedule_daily_status()
+        self.log("Updated daily schedule to new time")
     
 if __name__ == "__main__":
     monitor = LabMonitor(debug=True)

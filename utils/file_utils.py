@@ -53,7 +53,7 @@ def remove_number_by_index(index, file_path="Config/numbers.json"):
     return True
 
 
-def update_config(max_temp=None, hys=None, interval=None, file_path="Config/config.json"):
+def update_config(max_temp=None, hys=None, interval=None, daily_report=None, file_path="Config/config.json"):
     with open(file_path, 'r') as file:
         config = json.load(file)
         
@@ -63,5 +63,7 @@ def update_config(max_temp=None, hys=None, interval=None, file_path="Config/conf
         config['hysteresis'] = int(hys)
     if interval is not None:
         config['alert_interval'] = int(interval)
+    if daily_report is not None:
+        config['daily_report'] = daily_report
     with open(file_path, 'w') as file:
         json.dump(config, file, indent=4)
