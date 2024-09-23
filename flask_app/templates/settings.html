@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index-style.css') }}">
+    <script type="module" src="{{ url_for('static', filename='js/settings-script.js' ) }}"></script>
+    <title>GSM Alarm</title>
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="container">
+            <div class="sub-container">
+                <div class="button-container">
+                    <a href="/" class="button"> <img class="svg"
+                            src="{{ url_for('static', filename='imgs/home.svg') }}"> Home </a>
+                    <a href="/history" class="button"> <img class="svg"
+                            src="{{ url_for('static', filename='imgs/history.svg') }}"> History </a>
+                </div>
+                <div class="form-section">
+                    <h2>Configure Alarm</h2>
+                    <form id="config-form">
+
+                        <div class="input-group-grid">
+                            <div class="input-field">
+                                <label for="location">Location:</label>
+                                <input type="text" id="location" name="location" placeholder="Enter location" required>
+                            </div>
+
+                            <div class="input-field">
+                                <label for="max-temp">Max Temperature(°C):</label>
+                                <input type="number" id="max-temp" name="max-temp" min="-50" max="50" placeholder="(°C)"
+                                    value="0" required>
+                            </div>
+                            <div class="input-field">
+                                <label for="hysteresis">Hysteresis(°C):</label>
+                                <input type="number" id="hysteresis" name="hysteresis" min="-50" max="50"
+                                    placeholder="(°C)" value="0" required>
+                            </div>
+                            <div class="input-field">
+                                <label for="alert-interval">Alert Interval(minutes):</label>
+                                <input type="number" id="alert-interval" name="alert-interval" placeholder="(minutes)"
+                                    value="0" required>
+                            </div>
+                            <div class="input-field">
+                                <label for="daily_report_time">Daily report:</label>
+                                <input type="time" id="daily-report" name="daily_report_time" step="60" required>
+                            </div>
+                            <div class="toggle-container">
+                                <div class="input-field">
+                                    <label for="daily_report_time">Daily Report:</label>
+                                    <label class="switch">
+                                        <input type="checkbox" id="send-daily-report">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="input-field">
+                                    <label for="daily_report_time">Armed:</label>
+                                    <label class="switch">
+                                        <input type="checkbox" id="armed">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="button"><img class="svg"
+                                src="{{ url_for('static', filename='imgs/save.svg') }}"> Save Configuration</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="container">
+            <h2>Add phone number</h2>
+            <div class="form-section">
+                <form id="phone-form">
+                    <div class="input-group">
+                        <div class="input-field">
+                            <input type="text" id="name" name="name" placeholder="Enter Name" required>
+                            <input type="tel" id="phone" name="phone" placeholder="Enter Phone number" required>
+                        </div>
+
+                    </div>
+                    <div class="input-group">
+                        <input type="checkbox" id="daily-sms" name="daily" placeholder="Enter Phone number">
+                        <label for>Send Daily Status Reports? </label>
+                    </div>
+
+            </div>
+            <button type="submit" class="button"> <img class="svg"
+                    src="{{ url_for('static', filename='imgs/add.svg') }}"> Add Number</button>
+            </form>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone Number</th>
+                        <th>Daily Reports</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody id="phone-numbers">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+</body>
+
+</html>

@@ -4,10 +4,20 @@ when to send daily status               done
 numbers from json file                  done
 Units in label                          done
 phone number formating                   done 
+pi current time and signal stren        done
+daily report send dont send button        done
+admin number                            done
+log messages history on the website            done
+daily reports on off                          done
+arm disarm                                               done
+route file return same success and message   done
+location  in text                               done
+send time in am pm on webpage and different locations     done
 
 
-admin number
-daily report send dont send button 
-pi current time and signal stren
-log on web page 
+
+log debug on web page 
 reliable msg
+
+
+

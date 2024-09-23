@@ -5,85 +5,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index-style.css') }}">
-    <script src="{{ url_for('static', filename='js/index-script.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/index-script.js') }}"></script>
     <title>GSM Alarm</title>
 </head>
 
 <body>
     <div class="main-container">
+        <div class="status">
+            <div class="icon">
+                <img src="{{ url_for('static', filename='imgs/signal-strength-0.svg') }}" id="signal-strength"
+                    alt="Signal">
+                <span id="signal-type">Loading...</span>
+            </div>
+            <div class="time" id="pi-time">
+                Loading...
+            </div>
+        </div>
+
         <div class="container">
             <div class="sub-container">
-                <h2>Lab Conditions</h2>
+                <a href="/settings" class="button"> <img class="svg"
+                        src="{{ url_for('static', filename='imgs/settings.svg') }}"> Settings </a>
                 <table>
                     <tr>
                         <th>Parameter</th>
                         <th>Value</th>
                     </tr>
                     <tr>
+                        <td>Location</td>
+                        <td id="location">Loading...</td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td id="armed">Loading...</td>
+                    </tr>
+                    <tr>
                         <td>Current Temperature</td>
                         <td id="lab-temperature">Loading...</td>
                     </tr>
+                    <tr>
+                        <td>Max Temperature(°C):</td>
+                        <td id="max-temp">Loading...</td>
+                    </tr>
+                    <tr>
+                        <td>Hysteresis(°C):</td>
+                        <td id="hysteresis">Loading...</td>
+                    </tr>
+                    <tr>
+                        <td>Alert Interval(minutes):</td>
+                        <td id="alert-interval">Loading...</td>
+                    </tr>
+                    <tr>
+                        <td>Daily report time:</td>
+                        <td id="daily-report">Loading...</td>
+                    </tr>
+                    <tr>
+                        <td>Send Daily Reports?</td>
+                        <td id="send-daily-report">Loading...</td>
+                    </tr>
                 </table>
+
             </div>
         </div>
 
         <div class="container">
-            <div class="form-section">
-                <h2>Configure Alarm</h2>
-                <form id="config-form">
-
-                    <div class="input-group-grid">
-                        <div class="input-field">
-                            <label for="max-temp">Max Temperature(°C):</label>
-                            <input type="number" id="max-temp" name="max-temp" min="-50" max="50" placeholder="(°C)"
-                                value="0" required>
-                        </div>
-                        <div class="input-field">
-                            <label for="hysteresis">Hysteresis(°C):</label>
-                            <input type="number" id="hysteresis" name="hysteresis" min="-50" max="50" placeholder="(°C)"
-                                value="0" required>
-                        </div>
-                        <div class="input-field">
-                            <label for="alert-interval">Alert Interval(minutes):</label>
-                            <input type="number" id="alert-interval" name="alert-interval" placeholder="(minutes)"
-                                value="0" required>
-                        </div>
-                        <div class="input-field">
-                            <label for="daily_report">Daily report:</label>
-                            <input type="time" id="daily-report" name="daily_report" step="60" required>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="button">Save Configuration</button>
-                </form>
-            </div>
+            <h2>Phone Number List</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone Number</th>
+                        <th>Daily Reports</th>
+                    </tr>
+                </thead>
+                <tbody id="phone-numbers">
+                </tbody>
+            </table>
         </div>
 
-        <div class="container">
-            <div class="form-section">
-                <h2>Add Phone Number</h2>
-                <form id="phone-form">
-                    <div class="input-group">
-                        <div class="input-field">
-                            <input type="text" id="name" name="name" placeholder="Enter Name" required>
-                            <input type="tel" id="phone" name="phone" placeholder="Enter Phone number" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="button">Add Number</button>
-                </form>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Phone Number</th>
-                            <th>Delete</th>
-                        </tr>
-                    </thead>
-                    <tbody id="phone-numbers">
-                    </tbody>
-                </table>
-            </div>
-        </div>
+
     </div>
 </body>
 
