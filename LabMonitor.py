@@ -4,9 +4,9 @@ from coms.SIM7600x import SIM7600x
 import time
 import os
 import json 
-from utils.file_utils import write_history
 import threading
 import schedule
+import traceback
 
 
 class LabMonitor(threading.Thread):
@@ -31,32 +31,34 @@ class LabMonitor(threading.Thread):
         except Exception as err:
             error = str(err) if str(err) else str(err.__class__.__name__)
             self.log("Thread failed: %s" % error)
-            self.error = "Unhandled exception: %s" % error
-
+            self.log(traceback.format_exc())
+            
     def monitor_loop(self):
         while self.end_event.is_set() is False:
-            with self.lock:
-                temp = self.sensor.read_temp()
-            current_time = time.time()
-            if temp is not None:
-                self.log(f"Current Temperature: {temp}°C")
-                
-                if temp > self.config.max_temp:
-                    self.status = "RED"
+            if self.config.armed: 
+                with self.lock:
+                    temp = self.sensor.read_temp()
                     
-                if temp < self.config.max_temp-self.config.hysteresis and self.status == "RED":
-                    self.status = "GREEN"
-                    self.sms_thread.enqueue_sms(self.config.numbers, self.config.good_msg, temp)
+                current_time = time.time()
+                if temp is not None:
+                    self.log(f"Current Temperature: {temp}°C")
                     
-                if current_time - self.last_msg_time > self.config.alert_interval and self.status == "RED":   
-                    self.last_msg_time = time.time()
-                    self.log("Sending alert messages...")
-                    self.sms_thread.enqueue_sms(self.config.numbers, self.config.alert_msg, temp)
-                    write_history(self.config.alert_msg, temp, current_time)
-            else:
-                self.log("Error reading temprature")  
-                 
-            schedule.run_pending()
+                    if temp > self.config.max_temp:
+                        self.status = "RED"
+                        
+                    if temp < self.config.max_temp-self.config.hysteresis and self.status == "RED":
+                        self.status = "GREEN"
+                        self.sms_thread.enqueue_sms(self.config.numbers, self.config.good_msg, self.config.location, temp)
+                        
+                    if current_time - self.last_msg_time > self.config.alert_interval and self.status == "RED":   
+                        self.last_msg_time = time.time()
+                        self.log("Sending alert messages...")
+                        self.sms_thread.enqueue_sms(self.config.numbers, self.config.alert_msg, self.config.location, temp)
+                        
+                else:
+                    self.log("Error reading temprature")  
+                    
+                schedule.run_pending()
             time.sleep(self.check_interval) 
         
     def log(self, message):
@@ -71,29 +73,49 @@ class LabMonitor(threading.Thread):
             self.join()
             
     def get_config(self):
-        self.config = Config()
-        self.update_daily_status_schedule()
+        self.config=Config()
         with self.lock:
-            current_temp = self.sensor.read_temp()
-        numbers = self.config.numbers_list
+            temp = self.sensor.read_temp()
+        location = self.config.location
         max_temp = self.config.max_temp
         hysteresis = self.config.hysteresis
         alert_interval = self.config.alert_interval/60
-        daily_report = self.config.daily_report
-        return current_temp, max_temp, hysteresis, alert_interval, daily_report, numbers
+        daily_report_time = self.config.daily_report_time
+        armed = self.config.armed
+        send_daily_report = self.config.send_daily_report
+        signal_strength = self.sms_thread.get_signal_strength()
+        signal_type = self.sms_thread.get_signal_type()
+        pi_time = time.strftime("%B %d  %H:%M")
+        numbers = self.config.numbers_list
+        return {
+                "location": location,
+                "temp": temp, 
+                "max_temp":max_temp, 
+                "hys": hysteresis, 
+                "interval": alert_interval, 
+                "daily_report_time": daily_report_time,
+                "armed": armed,
+                "send_daily_report": send_daily_report,
+                "signal_strength": signal_strength, 
+                "signal_type": signal_type, 
+                "pi_time": pi_time,  
+                "numbers": numbers
+                }
     
     def schedule_daily_status(self):
-        schedule.every().day.at(self.config.daily_report).do(self.send_daily_status)
-        self.log(f"Scheduled daily status for {self.config.daily_report}")
-    
+        self.log(f"Scheduled daily status for {self.config.daily_report_time}")
+        schedule.every().day.at(self.config.daily_report_time).do(self.send_daily_status)
 
     def send_daily_status(self):
-        with self.lock:
-            current_temp = self.sensor.read_temp()
-        self.sms_thread.enqueue_sms(self.config.numbers, self.config.daily_msg, current_temp)
-        self.log("Sent daily status message")
+        if self.config.send_daily_report:
+            self.log("Sent daily status message")
+            with self.lock:
+                current_temp = self.sensor.read_temp()
+            self.sms_thread.enqueue_sms(self.config.daily_numbers, self.config.daily_msg, self.config.location, current_temp)
+       
     
     def update_daily_status_schedule(self):
+        self.config = Config()
         schedule.clear('daily_status')
         self.schedule_daily_status()
         self.log("Updated daily schedule to new time")

@@ -1,5 +1,6 @@
 import os
 import json
+import time 
 
 def write_history(message, temp, date, filepath="Config/past-alerts.json"):
     history_entry = {
@@ -23,13 +24,13 @@ def write_history(message, temp, date, filepath="Config/past-alerts.json"):
         json.dump(history_data, file, indent=4)
 
 
-def add_contact_to_file(name, number, file_path="Config/numbers.json"):
+def add_contact_to_file(name, number, daily_sms, file_path="Config/numbers.json"):
     with open(file_path, 'r') as file:
         contacts = json.load(file)
-    
     new_contact = {
         "name": name,
-        "number": number
+        "number": number,
+        "daily_sms": daily_sms
     }
     contacts.append(new_contact)
     with open(file_path, 'w') as file:
@@ -38,7 +39,6 @@ def add_contact_to_file(name, number, file_path="Config/numbers.json"):
         
 def remove_number_by_index(index, file_path="Config/numbers.json"):
     index -= 1
-    
     with open(file_path, 'r') as file:
         contacts = json.load(file)
     if 0 <= index < len(contacts):
@@ -49,21 +49,49 @@ def remove_number_by_index(index, file_path="Config/numbers.json"):
 
     with open(file_path, 'w') as file:
         json.dump(contacts, file, indent=4)
-        
     return True
 
 
-def update_config(max_temp=None, hys=None, interval=None, daily_report=None, file_path="Config/config.json"):
+def update_config(location=None, max_temp=None, hys=None, interval=None, daily_report_time=None, send_daily_report=None, armed=None, file_path="Config/config.json"):
     with open(file_path, 'r') as file:
         config = json.load(file)
-        
+    if location is not None:
+        config['location'] = location   
     if max_temp is not None:
         config['max_temp'] = int(max_temp)
     if hys is not None:
         config['hysteresis'] = int(hys)
     if interval is not None:
         config['alert_interval'] = int(interval)
-    if daily_report is not None:
-        config['daily_report'] = daily_report
+    if daily_report_time is not None:
+        config['daily_report_time'] = daily_report_time
+    if armed is not None:
+        config['armed'] = armed
+    if send_daily_report is not None:
+        config['send_daily_report'] = send_daily_report
+
+    
     with open(file_path, 'w') as file:
         json.dump(config, file, indent=4)
+        
+        
+def get_history_data(file_path="Config/past-alerts.json"):  
+    with open(file_path, 'r') as file:
+        try:
+            data = json.load(file)
+            history = []
+            for entry in data: 
+                time_struct = time.localtime(entry['time'])
+                readable_time = time.strftime('%I:%M %p, %b %d, %Y ', time_struct)
+                
+                processed_entry = {
+                    "message": entry['message'],
+                    "temperature": entry['temperature'],
+                    "time": readable_time
+                }
+                history.append(processed_entry)
+            histor = history.reverse()
+            return history
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Error parsing JSON file: {e}")
+
