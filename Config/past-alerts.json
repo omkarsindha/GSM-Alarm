@@ -1,87 +1,119 @@
 [
     {
-        "message": "Alert from GSM Alarm\n\nTemperature is above threshold",
-        "temperature": 30.687,
-        "time": 1726516597.2692113
+        "message": "Alert from Lab Monitor\n\nAlert resolved. Temperature is now normal :)\n\nLocation: Sand Box\nTemprature: 27.75 C \nTime: 04:11 PM, Sep 24, 2024"
     },
     {
-        "message": "Alert from GSM Alarm\n\nTemperature is above threshold",
-        "temperature": 25.25,
-        "time": 1726862159.2788324
+        "message": "Alert from Lab Monitor\n\nAlert resolved. Temperature is now normal :)\n\nLocation: Sand Box\nTemprature: 25.38 C \nTime: 04:13 PM, Sep 24, 2024"
     },
     {
-        "message": "Alert from GSM Alarm\n\nTemperature is above threshold",
-        "temperature": 26.437,
-        "time": 1726863322.267586
+        "message": "Alert from Lab Monitor\n\nAlert resolved. Temperature is now normal :)\n\nLocation: Sand Box\nTemprature: 24.94 C \nTime: 04:13 PM, Sep 24, 2024"
     },
     {
-        "message": "Alert from GSM Alarm\n\nTemperature is above threshold",
-        "temperature": 30.187,
-        "time": 1726865129.118459
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 27.0 C \nTime: 04:28 PM, Sep 24, 2024"
     },
     {
-        "message": "Alert from GSM Alarm\n\nTemperature is above threshold",
-        "temperature": 31.12,
-        "time": 1727103996.7969122
+        "message": "Alert from Lab Monitor\n\nAlert resolved. Temperature is now normal :)\n\nLocation: Sand Box\nTemprature: 24.81 C \nTime: 04:30 PM, Sep 24, 2024"
     },
     {
-        "message": "Alert Resolved\n\nTemperature is now normal :)",
-        "temperature": 28.25,
-        "time": 1727104044.8878446
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 27.25 C \nTime: 04:32 PM, Sep 24, 2024"
     },
     {
-        "message": "Alert from GSM Alarm\n\nTemperature is above threshold",
-        "temperature": 29.0,
-        "time": 1727115754.722522
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 25.0 C \nTime: 04:34 PM, Sep 24, 2024"
     },
     {
-        "message": "Alert Resolved\n\nTemperature is now normal :)",
-        "temperature": 25.44,
-        "time": 1727115789.751712
+        "message": "Alert from Lab Monitor\n\nAlert resolved. Temperature is now normal :)\n\nLocation: Sand Box\nTemprature: 24.94 C \nTime: 04:34 PM, Sep 24, 2024"
     },
     {
-        "message": "Daily Status Report",
-        "temperature": 24.25,
-        "time": 1727116144.3105133
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 27.12 C \nTime: 09:51 PM, Sep 24, 2024"
     },
     {
-        "message": "Daily Status Report",
-        "temperature": 24.62,
-        "time": 1727116682.6427639
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 25.12 C \nTime: 09:53 PM, Sep 24, 2024"
     },
     {
-        "message": "Alert from GSM Alarm\n\nTemperature is above threshold",
-        "temperature": 28.19,
-        "time": 1727117328.093589
+        "message": "Alert from Lab Monitor\n\nAlert resolved. Temperature is now normal :)\n\nLocation: Sand Box\nTemprature: 24.94 C \nTime: 09:53 PM, Sep 24, 2024"
     },
     {
-        "message": "Alert from GSM Alarm\n\nTemperature is above threshold",
-        "temperature": 26.81,
-        "time": 1727117372.940686
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 26.88 C \nTime: 09:52 AM, Sep 25, 2024"
     },
     {
-        "message": "Alert from GSM Alarm\n\nTemperature is above threshold",
-        "temperature": 26.06,
-        "time": 1727117471.1038315
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 23.56 C \nTime: 03:36 PM, Sep 25, 2024"
     },
     {
-        "message": "Alert Resolved\n\nTemperature is now normal :)",
-        "temperature": 24.88,
-        "time": 1727117494.4265273
+        "message": "Alert from Lab Monitor\n\nAlert resolved. Temperature is now normal :)\n\nLocation: Sand Box\nTemprature: 23.56 C \nTime: 03:36 PM, Sep 25, 2024"
     },
     {
-        "message": "Alert from Lab Monitor\n\nTemperature is above threshold",
-        "temperature": 30.94,
-        "time": 1727118881.1221333
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 23.5 C \nTime: 03:47 PM, Sep 25, 2024"
     },
     {
-        "message": "Alert from Lab Monitor\n\nAlert resolved. Temperature is now normal :)",
-        "temperature": 28.44,
-        "time": 1727118894.593961
+        "message": "Alert from Lab Monitor\n\nAlert resolved. Temperature is now normal :)\n\nLocation: Sand Box\nTemprature: 23.5 C \nTime: 03:47 PM, Sep 25, 2024"
     },
     {
-        "message": "Daily Status Report",
-        "temperature": 26.5,
-        "time": 1727119083.4106035
+        "message": "Alert from Lab Monitor\n\nPower lost, running on battery power\n\nLocation: Sand Box\nTemprature: 23.38 C \nTime: 09:49 AM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nPower lost, running on battery power\n\nLocation: Sand Box\nTemprature: 23.38 C \nTime: 09:52 AM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nPower lost, running on battery power\n\nLocation: Sand Box\nTemprature: 23.44 C \nTime: 09:57 AM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nPower lost, running on battery power\n\nLocation: Sand Box\nTemprature: 23.31 C \nTime: 10:25 AM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nPower lost, running on battery power\n\nLocation: Sand Box\nTemprature: 23.44 C \nTime: 10:29 AM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nPower has been recovered :)\n\nLocation: Sand Box\nTemprature: 23.38 C \nTime: 10:29 AM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 26.62 C \nTime: 10:30 AM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nAlert resolved. Temperature is now normal :)\n\nLocation: Sand Box\nTemprature: 24.88 C \nTime: 10:31 AM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 27.06 C \nTime: 10:35 AM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nAlert resolved. Temperature is now normal :)\n\nLocation: Sand Box\nTemprature: 24.69 C \nTime: 10:36 AM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nPower lost, running on battery power\n\nLocation: Sand Box\nTemprature: 24.5 C \nTime: 10:36 AM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nPower has been recovered :)\n\nLocation: Sand Box\nTemprature: 24.38 C \nTime: 10:37 AM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 23.19 C \nTime: 11:58 AM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 23.19 C \nTime: 12:00 PM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 23.12 C \nTime: 12:01 PM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 23.06 C \nTime: 12:02 PM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 23.0 C \nTime: 12:04 PM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 22.94 C \nTime: 12:05 PM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nTemperature is above threshold\n\nLocation: Sand Box\nTemprature: 22.88 C \nTime: 12:06 PM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nAlert resolved. Temperature is now normal :)\n\nLocation: Sand Box\nTemprature: 22.88 C \nTime: 12:06 PM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nPower lost, running on battery power\n\nLocation: Sand Box\nTemprature: 23.19 C \nTime: 02:05 PM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nPower lost, running on battery power\n\nLocation: Sand Box\nTemprature: 23.06 C \nTime: 03:12 PM, Sep 26, 2024"
+    },
+    {
+        "message": "Alert from Lab Monitor\n\nPower has been recovered :)\n\nLocation: Sand Box\nTemprature: 23.12 C \nTime: 03:13 PM, Sep 26, 2024"
     }
 ]

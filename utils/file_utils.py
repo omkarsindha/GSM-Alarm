@@ -2,11 +2,9 @@ import os
 import json
 import time 
 
-def write_history(message, temp, date, filepath="Config/past-alerts.json"):
+def write_history(message, filepath="Config/past-alerts.json"):
     history_entry = {
         "message": message,
-        "temperature": temp,
-        "time": date
     }
     
     if os.path.exists(filepath):
@@ -22,6 +20,18 @@ def write_history(message, temp, date, filepath="Config/past-alerts.json"):
 
     with open(filepath, "w") as file:
         json.dump(history_data, file, indent=4)
+
+def get_history_data(file_path="Config/past-alerts.json"):  
+    with open(file_path, 'r') as file:
+        try:
+            data = json.load(file)
+            history = []
+            for entry in data: 
+                history.append(entry)
+            histor = history.reverse()
+            return history
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Error parsing JSON file: {e}")
 
 
 def add_contact_to_file(name, number, daily_sms, file_path="Config/numbers.json"):
@@ -52,7 +62,7 @@ def remove_number_by_index(index, file_path="Config/numbers.json"):
     return True
 
 
-def update_config(location=None, max_temp=None, hys=None, interval=None, daily_report_time=None, send_daily_report=None, armed=None, file_path="Config/config.json"):
+def update_config(location=None, max_temp=None, hys=None, interval=None, daily_report_time=None, send_daily_report=None, armed=None, repeat_alerts=None, file_path="Config/config.json"):
     with open(file_path, 'r') as file:
         config = json.load(file)
     if location is not None:
@@ -69,29 +79,13 @@ def update_config(location=None, max_temp=None, hys=None, interval=None, daily_r
         config['armed'] = armed
     if send_daily_report is not None:
         config['send_daily_report'] = send_daily_report
+    if repeat_alerts is not None:
+        config['repeat_alerts'] = repeat_alerts
 
     
     with open(file_path, 'w') as file:
         json.dump(config, file, indent=4)
         
         
-def get_history_data(file_path="Config/past-alerts.json"):  
-    with open(file_path, 'r') as file:
-        try:
-            data = json.load(file)
-            history = []
-            for entry in data: 
-                time_struct = time.localtime(entry['time'])
-                readable_time = time.strftime('%I:%M %p, %b %d, %Y ', time_struct)
-                
-                processed_entry = {
-                    "message": entry['message'],
-                    "temperature": entry['temperature'],
-                    "time": readable_time
-                }
-                history.append(processed_entry)
-            histor = history.reverse()
-            return history
-        except json.JSONDecodeError as e:
-            raise ValueError(f"Error parsing JSON file: {e}")
+
 

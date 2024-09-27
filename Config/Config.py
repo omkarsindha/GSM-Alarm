@@ -5,17 +5,21 @@ class Config:
     def __init__(self, config_path="Config/config.json", numbers_path="Config/numbers.json"):
         self.location = ""
         self.max_temp = 0
-        self.hysteresis = 0
+        self.hysteresis = 0             # After reaching max temp device sends msg till drops below max temp - hys   
         self.password = 0
         self.alert_interval = 0
-        self.armed = False
+        self.armed = False              # On or Off
         self.send_daily_report = False
-        self.numbers = []
-        self.daily_numbers = []     # Numbers who want daily report sms
-        self.numbers_list = []
+        self.repeat_alerts = False
+        self.numbers = []               # Acutal phone number list
+        self.daily_numbers = []         # Phone Numbers who want daily report sms
+        self.numbers_list = []          # Phone Number object's list
         self.alert_msg = 'Alert from Lab Monitor\n\nTemperature is above threshold'
         self.good_msg = 'Alert from Lab Monitor\n\nAlert resolved. Temperature is now normal :)'
         self.daily_msg = 'Daily Status Report'
+        self.power_lost_msg = 'Alert from Lab Monitor\n\nPower lost, running on battery power'
+        self.power_rec_msg = 'Alert from Lab Monitor\n\nPower has been recovered :)'
+        self.low_battery_msg = 'Alert from Lab Monitor\n\nBattery is less than 10%'
         self.daily_report_time = ''
         self.config_path = config_path
         self.numbers_path = numbers_path
@@ -36,6 +40,7 @@ class Config:
         self.daily_report_time = settings.get("daily_report_time", "17:00")
         self.armed = settings.get("armed", self.armed)
         self.send_daily_report = settings.get("send_daily_report", self.send_daily_report)
+        self.repeat_alerts = settings.get("repeat_alerts", self.repeat_alerts)
 
         with open(self.numbers_path, "r") as file:
             try:

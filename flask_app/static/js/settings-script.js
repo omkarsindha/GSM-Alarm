@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('daily-report').value = data.daily_report_time;
             document.getElementById('armed').checked = data.armed
             document.getElementById('send-daily-report').checked = data.send_daily_report;
+            document.getElementById('repeat-alerts').checked = data.repeat_alerts;
             const phoneNumbersTable = document.getElementById('phone-numbers');
             phoneNumbersTable.innerHTML = '';
             data.numbers.forEach((number, index) => {
@@ -39,6 +40,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const daily_report_time = document.getElementById('daily-report').value;
         const send_daily_report = document.getElementById('send-daily-report').checked;
         const armed = document.getElementById('armed').checked;
+        const repeat_alerts = document.getElementById('repeat-alerts').checked;
+
 
         fetch('/configure-alarm', {
             method: 'POST',
@@ -52,7 +55,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 interval: interval,
                 daily_report_time: daily_report_time,
                 send_daily_report: send_daily_report,
-                armed: armed
+                armed: armed,
+                repeat_alerts: repeat_alerts
             })
         })
             .then(response => response.json())

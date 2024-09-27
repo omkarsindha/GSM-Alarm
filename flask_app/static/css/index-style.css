@@ -22,13 +22,6 @@ body {
 }
 
 
-.status {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 16px;
-}
-
 
 h1,
 h2 {
@@ -182,15 +175,19 @@ th {
     background-color: #2c2c2c;
 }
 
-.sub-container {
-    margin: 20px;
-}
 
 a {
     text-decoration: none;
     color: white;
 }
 
+
+.status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+}
 
 
 .status .icon {
@@ -207,10 +204,8 @@ a {
 }
 
 .status .time {
-    margin-left: auto;
     font-weight: bold;
 }
-
 
 .button img.svg {
     margin-left: 5px;
@@ -222,8 +217,8 @@ a {
 .switch {
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 34px;
+    width: 50px;
+    height: 28px;
     margin: 8px 0;
 }
 
@@ -248,8 +243,8 @@ a {
 .slider:before {
     position: absolute;
     content: "";
-    height: 26px;
-    width: 26px;
+    height: 20px;
+    width: 20px;
     left: 4px;
     bottom: 4px;
     background-color: white;
