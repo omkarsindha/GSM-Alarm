@@ -12,13 +12,17 @@
 <body>
     <div class="main-container">
         <div class="status">
+            <div class="time" id="pi-time">
+                Loading...
+            </div>
             <div class="icon">
                 <img src="{{ url_for('static', filename='imgs/signal-strength-0.svg') }}" id="signal-strength"
                     alt="Signal">
                 <span id="signal-type">Loading...</span>
             </div>
-            <div class="time" id="pi-time">
-                Loading...
+            <div class="icon">
+                <img src="{{ url_for('static', filename='imgs/battery-1.svg') }}" id="battery-icon" alt="Signal">
+                <span id="battery">Loading...</span>
             </div>
         </div>
 
@@ -62,6 +66,10 @@
                     <tr>
                         <td>Send Daily Reports?</td>
                         <td id="send-daily-report">Loading...</td>
+                    </tr>
+                    <tr>
+                        <td>Running on </td>
+                        <td id="power">Loading...</td>
                     </tr>
                 </table>
 

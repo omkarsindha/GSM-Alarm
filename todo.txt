@@ -13,11 +13,25 @@ arm disarm                                               done
 route file return same success and message   done
 location  in text                               done
 send time in am pm on webpage and different locations     done
-
+reliable msg             done
 
 
 log debug on web page 
-reliable msg
+test the app thoroughly, document the code and make a document for the device
 
 
 
+
+Problems I have had
+	1) Fan using the serial pins
+	2) Sending emoji over text
+	3) Syncing time to master clock
+	4) Max length of 70 in UCS2 encoding
+	5) GSM Module stopped working randomly
+	6) Factory reset issues
+    7) Flask app runs 2 times making 2 instance of monitor thread something related to debug being on or reloader when code is saved
+    8) Shutting application down nicely
+
+
+
+	when u come in front end is still remaining i was implementing history

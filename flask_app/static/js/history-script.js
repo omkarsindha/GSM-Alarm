@@ -7,8 +7,6 @@ document.addEventListener('DOMContentLoaded', function () {
             data.forEach((his) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${his.time}</td>
-                    <td>${his.temperature}°C</td>
                     <td>${his.message}</td>
                 `;
                 historyTable.appendChild(row);

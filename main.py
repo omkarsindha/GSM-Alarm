@@ -12,7 +12,7 @@ if __name__ == '__main__':
         try:
             if not os.environ.get('WERKZEUG_RUN_MAIN'):
                 start_monitor()
-            app.run(host='0.0.0.0', debug=True, use_reloader=False)#use_reloader=False
+            app.run(host='0.0.0.0', debug=True, use_reloader=False)
         except KeyboardInterrupt:
             pass
         finally:

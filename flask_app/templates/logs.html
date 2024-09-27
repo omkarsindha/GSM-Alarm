@@ -1,16 +1,20 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Debug Output</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/logs-style.css') }}">
+    <script src="{{ url_for('static', filename='js/socket.io.js' ) }}"></script>
 </head>
 
 <body>
-    <h1>Debug Output</h1>
-    <div id="output"></div>
+    <div class="container">
+        <h1>Lab Monitor Debug Output</h1>
+        <div id="output"></div>
+    </div>
+
 
     <script>
         const socket = io();
@@ -24,5 +28,20 @@
         });
     </script>
 </body>
+# import io
+# import logging
 
-</html>
+# socketio = SocketIO(app)
+# class WebSocketStream(io.StringIO):
+#     def write(self, message):
+#         socketio.emit('debug_output', {'data': message})
+# sys.stdout = WebSocketStream()
+# sys.stderr = WebSocketStream()
+
+# logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+# logger = logging.getLogger(__name__)
+
+# @socketio.on('connect')
+# def handle_connect():
+#     logger.info("Client connected to WebSocket")
+</html> -->

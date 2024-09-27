@@ -1,4 +1,5 @@
 from flask import request, jsonify, render_template, redirect, url_for
+from flask_socketio import SocketIO
 from flask_app import app
 from monitor_instance import get_monitor
 from utils.file_utils import (
@@ -11,9 +12,7 @@ from utils.file_utils import (
 from utils.utils import format_phone_number
 import sys
 
-
-
-
+    
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -26,6 +25,10 @@ def settings():
 def history():
     return render_template("history.html")
 
+@app.route("/logs")
+def logs():
+    return render_template("logs.html")
+
 @app.route("/configure-alarm", methods=["POST"])
 def configure_alarm(): 
     data = request.get_json()
@@ -36,11 +39,11 @@ def configure_alarm():
     daily_report_time = data.get('daily_report_time')
     send_daily_report = data.get('send_daily_report')
     armed = data.get("armed")
-    
-    update_config(location, max_temp, hys, interval, daily_report_time, send_daily_report, armed)  
+    repeat_alerts = data.get("repeat_alerts")
+    update_config(location, max_temp, hys, interval, daily_report_time, send_daily_report, armed, repeat_alerts)  
     monitor = get_monitor()
     if monitor is not None:
-        monitor.update_daily_status_schedule()
+        monitor.schedule_daily_status()
         return jsonify({"success": True})
     else:
         return jsonify({"success": False, "message": "Monitor not started/working"}), 400
@@ -83,3 +86,4 @@ def delete_number(index):
         return redirect(url_for('settings'))
     else:
         return jsonify({"success": False, "message": "Index out of range"}), 404
+    
