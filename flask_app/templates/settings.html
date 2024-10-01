@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index-style.css') }}">
     <script type="module" src="{{ url_for('static', filename='js/settings-script.js' ) }}"></script>
     <title>GSM Alarm</title>
+    <meta http-equiv="refresh" content="30">
 </head>
 
 <body>
@@ -30,7 +31,7 @@
                             </div>
 
                             <div class="input-field">
-                                <label for="max-temp">Max Temperature(°C):</label>
+                                <label for="max-temp">Trigger Temperature(°C):</label>
                                 <input type="number" id="max-temp" name="max-temp" min="-50" max="50" placeholder="(°C)"
                                     value="0" required>
                             </div>
@@ -42,7 +43,7 @@
                             <div class="input-field">
                                 <label for="alert-interval">Alert Interval(minutes):</label>
                                 <input type="number" id="alert-interval" name="alert-interval" placeholder="(minutes)"
-                                    value="0" required>
+                                    value="1" min="1" required>
                             </div>
                             <div class="input-field">
                                 <label for="daily_report_time">Daily report:</label>
@@ -93,8 +94,12 @@
 
                     </div>
                     <div class="input-group">
-                        <input type="checkbox" id="daily-sms" name="daily" placeholder="Enter Phone number">
-                        <label for>Send Daily Status Reports? </label>
+                        <input type="checkbox" id="daily-sms">
+                        <label>Send Daily Status Reports? </label>
+                    </div>
+                    <div class="input-group">
+                        <input type="checkbox" id="admin">
+                        <label>Give Administrator Privileges? </label>
                     </div>
 
             </div>
@@ -107,6 +112,7 @@
                         <th>Name</th>
                         <th>Phone Number</th>
                         <th>Daily Reports</th>
+                        <th>Admin</th>
                         <th>Delete</th>
                     </tr>
                 </thead>

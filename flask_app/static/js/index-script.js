@@ -30,16 +30,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
       document.getElementById('max-temp').textContent = data.max_temp + '°C';
       document.getElementById('hysteresis').textContent = data.hys + '°C';
-      document.getElementById('alert-interval').textContent = data.interval + ' minutes';
 
-      const time = convertTo12Hour(data.daily_report_time)
-      document.getElementById('daily-report').textContent = time;
+      let repeat_alerts = document.getElementById('repeat-alerts');
+      repeat_alerts.textContent = data.repeat_alerts == true ? "Yes" : "No";
+      repeat_alerts.style.color = data.repeat_alerts == true ? "#4CAF50" : "#FF4C4C";
+
+      document.getElementById('alert-interval').textContent = data.repeat_alerts == true ? data.interval + " minutes" : "N/A";
 
       let send_daily_report = document.getElementById('send-daily-report');
       send_daily_report.textContent = data.send_daily_report == true ? "Yes" : "No";
       send_daily_report.style.color = data.send_daily_report == true ? "#4CAF50" : "#FF4C4C";
 
-      document.getElementById('power').textContent = data.power
+      const time = convertTo12Hour(data.daily_report_time)
+      document.getElementById('daily-report').textContent = data.send_daily_report == true ? time : "N/A";
+
+      document.getElementById('power').textContent = data.power + " Power"
+      update_status(data.max_temp, data.temp, data.power)
 
       const phoneNumbersTable = document.getElementById('phone-numbers');
       phoneNumbersTable.innerHTML = '';
@@ -50,6 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
           <td>${number.name}</td>
           <td>${num}</td>
           <td>${(number.daily_sms == true) ? "Yes" : "No"}</td>
+          <td>${(number.admin == true) ? "Yes" : "No"}</td>
         `;
         phoneNumbersTable.appendChild(row);
       });
@@ -59,6 +66,26 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+
+function update_status(max_temp, temp, power) {
+  const statusElement = document.getElementById('status');
+  if (!statusElement) {
+    console.error('Element with id "status" not found.');
+    return;
+  }
+  if (temp >= max_temp) {
+    statusElement.textContent = "Critical Temperature!"
+    statusElement.style.color = "#FF4C4C"
+    return
+  }
+  if (power == "UPS") {
+    statusElement.textContent = "Power Outage!"
+    statusElement.style.color = "#FF4C4C"
+    return
+  }
+  statusElement.textContent = "All Good"
+  statusElement.style.color = "#4CAF50"
+}
 
 
 function update_signal_strength_icon(signal_strength) {
@@ -91,7 +118,7 @@ function update_battery_icon(power, battery) {
     console.error('Element with id "battery-icon" not found.');
     return;
   }
-  if (power == "Grid Power") {
+  if (power == "120V-AC") {
     batteryElement.src = "/static/imgs/battery-charging.svg";
   } else if (battery > 60) {
     batteryElement.src = "/static/imgs/battery-3.svg";

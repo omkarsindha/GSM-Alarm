@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <td>${number.name}</td>
                     <td>${num}</td>
                     <td>${(number.daily_sms == true) ? "Yes" : "No"}</td>
+                    <td>${(number.admin == true) ? "Yes" : "No"}</td>
                     <td><a href="/delete-number/${index + 1}" class="delete-button">Delete</a></td>
                 `;
                 phoneNumbersTable.appendChild(row);
@@ -73,24 +74,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('phone-form').addEventListener('submit', function (event) {
         event.preventDefault();
-
         const name = document.getElementById('name').value;
         const phone = document.getElementById('phone').value;
         const daily_sms = document.getElementById('daily-sms').checked;
-
+        const admin = document.getElementById('admin').checked;
         const cleanedPhone = phone.replace(/\D/g, '');
 
         if (cleanedPhone.length < 10) {
             alert('Phone number must be at least 10 digits long.');
             return;
         }
-
         fetch('/add-phone-number', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ name: name, phone: cleanedPhone, daily_sms: daily_sms })
+            body: JSON.stringify({ name: name, phone: cleanedPhone, daily_sms: daily_sms, admin: admin })
         })
             .then(response => response.json())
             .then(data => {

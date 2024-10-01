@@ -1,11 +1,11 @@
 {
     "location": "Sand Box",
-    "max_temp": 26,
+    "max_temp": 27,
     "hysteresis": 1,
     "password": 1234,
-    "alert_interval": 1,
-    "daily_report_time": "10:40",
+    "alert_interval": 2,
+    "daily_report_time": "09:26",
     "armed": true,
     "send_daily_report": true,
-    "repeat_alerts": true
+    "repeat_alerts": false
 }
