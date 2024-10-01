@@ -3,7 +3,7 @@ from flask_socketio import SocketIO
 from flask_app import app
 from monitor_instance import get_monitor
 from utils.file_utils import (
-    add_contact_to_file,
+    add_number_to_file,
     remove_number_by_index,
     update_config,
     get_history_data,
@@ -69,13 +69,14 @@ def get_history():
     
 @app.route('/add-phone-number', methods=['POST'])
 def add_phone_number():
+    print("hiii")
     data = request.get_json()
     name = data.get('name')
     phone = format_phone_number(data.get('phone'))
     daily_sms = data.get('daily_sms')
-    
+    admin = data.get('admin')
     if name and phone:
-        add_contact_to_file(name, phone, daily_sms)
+        add_number_to_file(name, phone, daily_sms, admin)
         return jsonify({"success": True})
     else:
         return jsonify({"success": False, "message": "Invalid data"}), 400

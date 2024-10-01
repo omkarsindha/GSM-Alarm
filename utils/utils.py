@@ -15,3 +15,9 @@ def get_rdbl_time():
     """Returns current time in a readable format"""
     return time.strftime("%I:%M %p, %b %d, %Y")
     
+def is_number(n):
+    try:
+        float(n)
+        return n > 0
+    except ValueError:
+        return False

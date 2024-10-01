@@ -28,25 +28,32 @@ def get_history_data(file_path="Config/past-alerts.json"):
             history = []
             for entry in data: 
                 history.append(entry)
-            histor = history.reverse()
-            return history
+            return history.reverse()
+
         except json.JSONDecodeError as e:
             raise ValueError(f"Error parsing JSON file: {e}")
 
-
-def add_contact_to_file(name, number, daily_sms, file_path="Config/numbers.json"):
+def get_number_list(file_path="Config/numbers.json"):
     with open(file_path, 'r') as file:
-        contacts = json.load(file)
+        try:
+            numbers = json.load(file)
+            return numbers
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Error parsing JSON file: {e}")
+        
+def add_number_to_file(name, number, daily_sms, admin, file_path="Config/numbers.json"):
+    with open(file_path, 'r') as file:
+        numbers = json.load(file)
     new_contact = {
         "name": name,
         "number": number,
-        "daily_sms": daily_sms
+        "daily_sms": daily_sms,
+        "admin": admin
     }
-    contacts.append(new_contact)
+    numbers.append(new_contact)
     with open(file_path, 'w') as file:
-        json.dump(contacts, file, indent=4)
-        
-        
+        json.dump(numbers, file, indent=4)
+             
 def remove_number_by_index(index, file_path="Config/numbers.json"):
     index -= 1
     with open(file_path, 'r') as file:
@@ -60,7 +67,6 @@ def remove_number_by_index(index, file_path="Config/numbers.json"):
     with open(file_path, 'w') as file:
         json.dump(contacts, file, indent=4)
     return True
-
 
 def update_config(location=None, max_temp=None, hys=None, interval=None, daily_report_time=None, send_daily_report=None, armed=None, repeat_alerts=None, file_path="Config/config.json"):
     with open(file_path, 'r') as file:
@@ -81,11 +87,15 @@ def update_config(location=None, max_temp=None, hys=None, interval=None, daily_r
         config['send_daily_report'] = send_daily_report
     if repeat_alerts is not None:
         config['repeat_alerts'] = repeat_alerts
-
-    
     with open(file_path, 'w') as file:
         json.dump(config, file, indent=4)
         
-        
+def get_config(file_path="Config/config.json"):
+    with open(file_path, 'r') as file:
+        try:
+            config = json.load(file)
+            return config
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Error parsing JSON file: {e}")
 
 

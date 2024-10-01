@@ -8,9 +8,8 @@ import json
 import threading
 import schedule
 import traceback
-from utils.utils import get_rdbl_time
-from utils.file_utils import write_history
-
+from utils.utils import get_rdbl_time, is_number
+from utils.file_utils import write_history, update_config
 
 class LabMonitor(threading.Thread):
     """
@@ -24,16 +23,16 @@ class LabMonitor(threading.Thread):
         self.config = Config(config_path="Config/config.json")
         self.sensor = TemperatureSensor()
         self.ups = UPS()
-        self.sms_thread = SIM7600x(debug=debug)
-        self.sms_thread.start()
+        self.gsm_modem = SIM7600x(parent=self, debug=debug)
+        self.gsm_modem.connect()
         
         self.debug = debug
         self.check_interval = check_interval
         self.last_msg_time = time.time() - self.config.alert_interval
         self.end_event = threading.Event()
         self.status: str = "GREEN"  # Initial status is GREEN (normal)
-        self.power: str = "GRID"    # Initial power source is GRID
-        self.power_last_state: str = "GRID"
+        self.power: str = "120V-AC"    # Initial power source is 120V-AC
+        self.power_last_state: str = "120V-AC"
         self.low_battery = False
         self.temp = 0
         
@@ -57,7 +56,7 @@ class LabMonitor(threading.Thread):
         while not self.end_event.is_set():
             # Read current temperature and power status
             self.temp = self.sensor.read_temp()
-            self.power = self.ups.get_status() # GRID or BATTERY
+            self.power = self.ups.get_status() # 120V-AC or UPS
             self.log(f"Status (Temperature: {self.temp}°C || Power: {self.power})") 
             
             if self.config.armed:       # If the Alarm is active
@@ -66,49 +65,53 @@ class LabMonitor(threading.Thread):
                 # Check if temperature exceeds maximum allowed
                 if self.temp > self.config.max_temp:
                     self.status = "RED"
-                
+
                 # Check if temperature has returned to normal
                 if self.temp < self.config.max_temp - self.config.hysteresis and self.status == "RED":
-                    self.log("Sending temprerature back to normal message")
+                    self.log("Sending temprerature back to normal message status set to GREEN")
                     self.status = "GREEN"
                     # Reseting the time so that device is ready to send messages
                     if self.config.repeat_alerts:        
                         self.last_msg_time = time.time()-self.config.alert_interval 
-                    msg = f"{self.config.good_msg}\n\nLocation: {self.config.location}\nTemprature: {self.temp} C \nTime: {get_rdbl_time()}"
+                    msg = f"{self.config.good_msg}\n\nLocation: {self.config.location}\nTemperature: {self.temp}°C \nTime: {get_rdbl_time()}"
                     self.send_sms(self.config.numbers, msg)
                 
                 # Send alert if temperature is still high after alert interval
                 if cur_time - self.last_msg_time > self.config.alert_interval and self.status == "RED":
-                    self.log("Sending High Temprature Message")
+                    self.log("Sending High Temperature Message")
                     if not self.config.repeat_alerts:
                         self.last_msg_time = float('inf')  # So that it could never send message again
                     else:
                         self.last_msg_time = time.time()
-                    msg = f"{self.config.alert_msg}\n\nLocation: {self.config.location}\nTemprature: {self.temp} C \nTime: {get_rdbl_time()}"
+                    msg = f"{self.config.alert_msg}\n\nLocation: {self.config.location}\nTemperature: {self.temp}°C \nTime: {get_rdbl_time()}"
                     self.send_sms(self.config.numbers, msg)
                     
                 # Handle changes in power source
                 if self.power != self.power_last_state:
                     self.log("Sending power type changed message")
-                    if self.power_last_state == "GRID":
-                        msg = f"{self.config.power_lost_msg}\n\nLocation: {self.config.location}\nTemprature: {self.temp} C \nTime: {get_rdbl_time()}"
+                    if self.power_last_state == "120V-AC":
+                        msg = f"{self.config.power_lost_msg}\n\nLocation: {self.config.location}\nTemperature: {self.temp}°C \nTime: {get_rdbl_time()}"
                     else:
-                        msg = f"{self.config.power_rec_msg}\n\nLocation: {self.config.location}\nTemprature: {self.temp} C \nTime: {get_rdbl_time()}"
+                        msg = f"{self.config.power_rec_msg}\n\nLocation: {self.config.location}\nTemperature: {self.temp}°C \nTime: {get_rdbl_time()}"
                     self.low_battery = False
                     self.send_sms(self.config.numbers, msg)
                     self.power_last_state = self.power
-                    
-                if self.power == "BATTERY":
+                
+                # Case when battery is low 
+                if self.power == "UPS":
                     percentage = self.ups.get_battery_level()
-                    if percentage <= 10 and self.low_battery == False:
+                    if percentage <= 80 and self.low_battery == False:
                         self.log("Sending low battery message")
-                        msg = f"{self.config.low_battery_msg}\n\nLocation: {self.config.location}\nTemprature: {self.temp} C \nTime: {get_rdbl_time()}"
+                        msg = f"{self.config.low_battery_msg}\n\nLocation: {self.config.location}\nTemperature: {self.temp}°C \nTime: {get_rdbl_time()}"
                         self.send_sms(self.config.numbers, msg)
                         self.low_battery = True
                     
                 # Run any scheduled daily status reports
                 schedule.run_pending()
-            
+            else:
+                if self.status == "RED":
+                    self.log("System disarmed, resetting status to GREEN")
+                    self.status = "GREEN"
             time.sleep(self.check_interval)
             
     def stop(self, block=False):
@@ -116,7 +119,7 @@ class LabMonitor(threading.Thread):
         Signal the thread to end. Block only if block=True.
         """
         self.end_event.set()
-        self.sms_thread.stop()
+        self.gsm_modem.close()
         if block:
             self.join()
             
@@ -125,37 +128,22 @@ class LabMonitor(threading.Thread):
         Get all the config values of the Monitor
         """
         self.config.load_config()
-        temp = self.temp
-        location = self.config.location
-        max_temp = self.config.max_temp
-        hysteresis = self.config.hysteresis
-        alert_interval = self.config.alert_interval / 60
-        daily_report_time = self.config.daily_report_time
-        armed = self.config.armed
-        send_daily_report = self.config.send_daily_report
-        repeat_alerts = self.config.repeat_alerts
-        signal_strength = self.sms_thread.get_signal_strength()
-        signal_type = self.sms_thread.get_signal_type()
-        pi_time = time.strftime("%B %d  %H:%M")
-        numbers = self.config.numbers_list
-        power = "Grid Power" if self.power=="GRID" else "UPS"
-        battery = self.ups.get_battery_level()
         return {
-                "location": location,
-                "temp": temp, 
-                "max_temp": max_temp, 
-                "hys": hysteresis, 
-                "interval": alert_interval, 
-                "daily_report_time": daily_report_time,
-                "armed": armed,
-                "send_daily_report": send_daily_report,
-                "repeat_alerts": repeat_alerts,
-                "signal_strength": signal_strength, 
-                "signal_type": signal_type, 
-                "pi_time": pi_time,  
-                "numbers": numbers,
-                "power": power,
-                "battery": battery
+                "location": self.config.location,
+                "temp": self.temp, 
+                "max_temp": self.config.max_temp, 
+                "hys": self.config.hysteresis, 
+                "interval": self.config.alert_interval / 60, 
+                "daily_report_time": self.config.daily_report_time,
+                "armed": self.config.armed,
+                "send_daily_report": self.config.send_daily_report,
+                "repeat_alerts": self.config.repeat_alerts,
+                "signal_strength": self.gsm_modem.get_signal_strength(), 
+                "signal_type": self.gsm_modem.get_network_type(), 
+                "pi_time": time.strftime("%B %d  %H:%M"),  
+                "numbers": self.config.numbers_list,
+                "power": self.power,
+                "battery": self.ups.get_battery_level()
                 }
     
     def schedule_daily_status(self):
@@ -173,14 +161,14 @@ class LabMonitor(threading.Thread):
         """
         if self.config.send_daily_report:
             self.log("Sent daily status message")
-            msg = f"{self.config.daily_msg}\n\nLocation: {self.config.location}\nTemprature: {self.temp} C \nTime: {get_rdbl_time()}"
-            self.sms_thread.enqueue_sms(self.config.daily_numbers, msg)
+            msg = f"{self.config.daily_msg}\n\nLocation: {self.config.location}\nTemperature: {self.temp}°C \nTime: {get_rdbl_time()}"
+            self.gsm_modem.send_sms_to_many(self.config.daily_numbers, msg)
         
     def send_sms(self, numbers, msg):
         """
         Puts the SMS into queue and writes history
         """
-        self.sms_thread.enqueue_sms(numbers, msg)
+        self.gsm_modem.send_sms_to_many(numbers, msg)
         write_history(msg)
     
     def log(self, message):
@@ -190,6 +178,52 @@ class LabMonitor(threading.Thread):
         if self.debug:
             print(message)
             
+    def handle_sms(self, sms):
+        text = sms.text.lower().strip()
+        num = sms.number
+        if num in self.config.numbers:  # Check if the message came from the list of numbers in the database
+            if text == 'status':  # Same for admin and normal users
+                config = self.get_config()
+                armed = 'Armed' if config['armed'] else 'Disarmed'
+                message = f"Temperature: {config['temp']}°C\nTrigger: {config['max_temp']}°C\nPower: {config['power']}\nArm/Disarm: {armed}"
+                self.gsm_modem.send_sms(num, message)
+                return
+
+            if text == 'time':  # Same for admin and normal users
+                message = f"Time: {get_rdbl_time()}"
+                self.gsm_modem.send_sms(num, message)
+                return
+
+            if text == 'help':
+                help_message = self.config.admin_help if num in self.config.admins else self.config.help   # Seperate for both
+                self.gsm_modem.send_sms(num, help_message)
+                return
+
+            if num in self.config.admins:  # Additional commands for admin users
+                parts = text.split()
+                if len(parts) == 3:
+                    if parts[0] == 'set' and parts[1] == 'repeat-alerts' and parts[2] in ['on', 'off']:
+                        status = parts[2].lower()
+                        if status == 'on':
+                            update_config(repeat_alerts = True)  
+                        else:
+                            update_config(repeat_alerts = False)  
+                        self.gsm_modem.send_sms(num, f"Repeat-Alerts set to '{status}'.")
+                        
+                    elif parts[0] == 'set' and parts[1] == 'alert-interval' and is_positive_number(parts[2]):
+                        interval = int(parts[2])
+                        update_config(interval = interval) 
+                        self.gsm_modem.send_sms(num, f"Alert interval set to {interval} minutes.")                       
+                        
+                    else:
+                        self.gsm_modem.send_sms(num, "Invalid value for repeat-alerts. Please enter 'on' or 'off'.")
+                    return 
+    
+            self.gsm_modem.send_sms(num, "Invalid command. Send 'help' for more details.")
+
+            
+           
+        
 if __name__ == "__main__":
     # Create and start a LabMonitor instance for testing
     monitor = LabMonitor(debug=True)

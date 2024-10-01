@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index-style.css') }}">
     <script type="module" src="{{ url_for('static', filename='js/index-script.js') }}"></script>
     <title>GSM Alarm</title>
+    <meta http-equiv="refresh" content="30">
 </head>
 
 <body>
@@ -36,36 +37,44 @@
                         <th>Value</th>
                     </tr>
                     <tr>
+                        <td>Status</td>
+                        <td id="status">Loading...</td>
+                    </tr>
+                    <tr>
                         <td>Location</td>
                         <td id="location">Loading...</td>
                     </tr>
                     <tr>
-                        <td>Status</td>
+                        <td>Armed/Disarmed</td>
                         <td id="armed">Loading...</td>
+                    </tr>
+                    <tr>
+                        <td>Trigger Temperature(°C):</td>
+                        <td id="max-temp">Loading...</td>
                     </tr>
                     <tr>
                         <td>Current Temperature</td>
                         <td id="lab-temperature">Loading...</td>
                     </tr>
                     <tr>
-                        <td>Max Temperature(°C):</td>
-                        <td id="max-temp">Loading...</td>
-                    </tr>
-                    <tr>
                         <td>Hysteresis(°C):</td>
                         <td id="hysteresis">Loading...</td>
+                    </tr>
+                    <tr>
+                        <td>Repeat Alerts?</td>
+                        <td id="repeat-alerts">Loading...</td>
                     </tr>
                     <tr>
                         <td>Alert Interval(minutes):</td>
                         <td id="alert-interval">Loading...</td>
                     </tr>
                     <tr>
-                        <td>Daily report time:</td>
-                        <td id="daily-report">Loading...</td>
-                    </tr>
-                    <tr>
                         <td>Send Daily Reports?</td>
                         <td id="send-daily-report">Loading...</td>
+                    </tr>
+                    <tr>
+                        <td>Daily report time:</td>
+                        <td id="daily-report">Loading...</td>
                     </tr>
                     <tr>
                         <td>Running on </td>
@@ -84,6 +93,7 @@
                         <th>Name</th>
                         <th>Phone Number</th>
                         <th>Daily Reports</th>
+                        <th>Admin</th>
                     </tr>
                 </thead>
                 <tbody id="phone-numbers">
