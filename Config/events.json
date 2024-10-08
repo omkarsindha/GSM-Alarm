@@ -1,0 +1,178 @@
+[
+    {
+        "event": "High temperature",
+        "time": "04:44 PM, Oct 07, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "08:55 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "08:56 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "08:57 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "08:58 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "08:59 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:01 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "09:01 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:04 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:06 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "09:06 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Daily report",
+        "time": "09:09 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:10 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:11 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:13 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:14 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "09:15 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:25 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "09:25 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:29 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "09:29 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:33 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:34 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "09:34 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:35 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:36 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:37 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "09:37 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:38 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:39 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:40 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:45 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "09:46 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "09:46 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Help request by Omkarsinh Sindha",
+        "time": "09:57 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Time request by Omkarsinh Sindha",
+        "time": "09:57 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "10:00 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Help request by Omkarsinh Sindha",
+        "time": "10:00 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Time request by Omkarsinh Sindha",
+        "time": "10:00 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "10:05 AM, Oct 08, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "10:06 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "10:06 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "11:18 AM, Oct 08, 2024"
+    },
+    {
+        "event": "Power changed to 120V-AC",
+        "time": "11:18 AM, Oct 08, 2024"
+    }
+]

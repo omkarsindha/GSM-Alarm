@@ -1,0 +1,14 @@
+{
+    "/sys/bus/w1/devices/28-3c01d60779ab/w1_slave": {
+        "name": "Hot",
+        "trigger": 29
+    },
+    "/sys/bus/w1/devices/28-00000d79538b/w1_slave": {
+        "name": "Cold",
+        "trigger": 30
+    },
+    "/sys/bus/w1/devices/28-00xxx79538b/w1_slave": {
+        "name": "Unknown",
+        "trigger": 99
+    }
+}

@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index-style.css') }}">
-    <script type="module" src="{{ url_for('static', filename='js/history-script.js' ) }}"></script>
-    <title>GSM Alarm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Lab Monitor History</title>
     <meta http-equiv="refresh" content="30">
 </head>
 
@@ -15,24 +14,31 @@
         <div class="container">
             <div class="sub-container">
                 <div class="button-container">
-                    <a href="/" class="button"> <img class="svg"
-                            src="{{ url_for('static', filename='imgs/home.svg') }}"> Home </a>
-                    <a href="/settings" class="button"> <img class="svg"
-                            src="{{ url_for('static', filename='imgs/settings.svg') }}"> Settings </a>
+                    <a href="/" class="button">
+                        <img class="svg" src="{{ url_for('static', filename='imgs/home.svg') }}"> Home
+                    </a>
+                    <a href="/settings" class="button">
+                        <img class="svg" src="{{ url_for('static', filename='imgs/settings.svg') }}"> Settings
+                    </a>
                 </div>
                 <table>
                     <thead>
                         <tr>
-                            <th>History</th>
+                            <th>Event</th>
+                            <th>Time</th>
                         </tr>
                     </thead>
                     <tbody id="history">
+                        {% for event in history %}
+                        <tr>
+                            <td>{{ event.event }}</td>
+                            <td>{{ event.time }}</td>
+                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
-
             </div>
         </div>
-    </div>
     </div>
 </body>
 

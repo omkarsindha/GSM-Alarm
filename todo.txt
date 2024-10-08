@@ -19,10 +19,13 @@ how to send big messages           done
 inquire device time  done
 admin number                          done
 config file methods to file utils         done
+settings thru message               done
+repeat-alerts             done
+
+Note : to fix network use at+cops=0
 
 test the app thoroughly, document the code and make a document for the device
-settings
-
+make a help page
 
 
 Problems I have had
