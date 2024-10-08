@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Lab Monitor Help</title>
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="container">
+            <div class="sub-container">
+                <div class="button-container">
+                    <a href="/" class="button">
+                        <img class="svg" src="{{ url_for('static', filename='imgs/home.svg') }}"> Home
+                    </a>
+                </div>
+                <div class="content">
+                    <h2>Lab Monitor Help</h2>
+                    <div class="entry">
+                        <h4>Arm/Disarm:</h4>
+                        <p>"Arm" means the alarm is active and can send SMS notifications. "Disarm" means it is
+                            currently turned off.</p>
+                    </div>
+                    <div class="entry">
+                        <h4>Hysteresis:</h4>
+                        <p>When the temperature exceeds the trigger threshold, the alarm will continue to send messages
+                            until the temperature drops below the trigger threshold minus the hysteresis value.</p>
+                    </div>
+                    <div class="entry">
+                        <h4>Repeat Alerts:</h4>
+                        <p>If turned off, the system sends an alert SMS only once. If turned on, it will keep sending
+                            SMS alerts at the set interval.</p>
+                    </div>
+                    <div class="entry">
+                        <h4>Send Daily Report:</h4>
+                        <p>Sends an SMS report at the set time every day to users who have opted in for daily reports.
+                        </p>
+                    </div>
+                    <div class="entry">
+                        <h4>Power Source:</h4>
+                        <p>Indicates whether the system is running on 120-AC power or UPS power if there is no main
+                            power supply.</p>
+                    </div>
+                    <div class="entry">
+                        <h4>Add Phone Number:</h4>
+                        <p>Send daily status report: Check this box if you want this number to receive daily reports
+                            from the alarm system.</p>
+                        <p>Grant Administrator Privileges: Check this box if you want this number to have the ability to
+                            configure the alarm settings via messages.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

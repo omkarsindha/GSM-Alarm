@@ -4,10 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index-style.css') }}">
-    <script type="module" src="{{ url_for('static', filename='js/settings-script.js' ) }}"></script>
-    <title>GSM Alarm</title>
-    <meta http-equiv="refresh" content="30">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Lab Monitor Settings</title>
 </head>
 
 <body>
@@ -15,97 +13,128 @@
         <div class="container">
             <div class="sub-container">
                 <div class="button-container">
-                    <a href="/" class="button"> <img class="svg"
-                            src="{{ url_for('static', filename='imgs/home.svg') }}"> Home </a>
-                    <a href="/history" class="button"> <img class="svg"
-                            src="{{ url_for('static', filename='imgs/history.svg') }}"> History </a>
+                    <a href="/" class="button">
+                        <img class="svg" src="{{ url_for('static', filename='imgs/home.svg') }}"> Home
+                    </a>
+                    <a href="/history" class="button">
+                        <img class="svg" src="{{ url_for('static', filename='imgs/history.svg') }}"> History
+                    </a>
                 </div>
                 <div class="form-section">
                     <h2>Configure Alarm</h2>
-                    <form id="config-form">
-
+                    <form id="config-form" action="{{ url_for('configure_alarm') }}" method="POST">
                         <div class="input-group-grid">
                             <div class="input-field">
                                 <label for="location">Location:</label>
-                                <input type="text" id="location" name="location" placeholder="Enter location" required>
-                            </div>
-
-                            <div class="input-field">
-                                <label for="max-temp">Trigger Temperature(°C):</label>
-                                <input type="number" id="max-temp" name="max-temp" min="-50" max="50" placeholder="(°C)"
-                                    value="0" required>
+                                <input type="text" id="location" name="location" value="{{ location }}"
+                                    placeholder="Enter location" required>
                             </div>
                             <div class="input-field">
                                 <label for="hysteresis">Hysteresis(°C):</label>
-                                <input type="number" id="hysteresis" name="hysteresis" min="-50" max="50"
-                                    placeholder="(°C)" value="0" required>
+                                <input type="number" id="hysteresis" name="hys" min="-50" max="50" value="{{ hys }}"
+                                    placeholder="(°C)" required>
                             </div>
                             <div class="input-field">
                                 <label for="alert-interval">Alert Interval(minutes):</label>
-                                <input type="number" id="alert-interval" name="alert-interval" placeholder="(minutes)"
-                                    value="1" min="1" required>
+                                <input type="number" id="alert-interval" name="interval" value="{{ interval }}"
+                                    placeholder="(minutes)" min="1" required>
                             </div>
                             <div class="input-field">
-                                <label for="daily_report_time">Daily report:</label>
-                                <input type="time" id="daily-report" name="daily_report_time" step="60" required>
+                                <label for="daily-report">Daily report:</label>
+                                <input type="time" id="daily-report" name="daily_report_time"
+                                    value="{{ daily_report_time }}" step="60" required>
                             </div>
                             <div class="toggle-container">
                                 <div class="input-field">
                                     <label>Daily Report:</label>
                                     <label class="switch">
-                                        <input type="checkbox" id="send-daily-report">
+                                        <input type="checkbox" id="send-daily-report" name="send_daily_report" {% if
+                                            send_daily_report %}checked{% endif %}>
                                         <span class="slider"></span>
                                     </label>
                                 </div>
                                 <div class="input-field">
                                     <label>Repeat Alerts:</label>
                                     <label class="switch">
-                                        <input type="checkbox" id="repeat-alerts">
+                                        <input type="checkbox" id="repeat-alerts" name="repeat_alerts" {% if
+                                            repeat_alerts %}checked{% endif %}>
                                         <span class="slider"></span>
                                     </label>
                                 </div>
                                 <div class="input-field">
                                     <label>Armed:</label>
                                     <label class="switch">
-                                        <input type="checkbox" id="armed">
+                                        <input type="checkbox" id="armed" name="armed" {% if armed %}checked{% endif %}>
                                         <span class="slider"></span>
                                     </label>
                                 </div>
                             </div>
                         </div>
-
-                        <button type="submit" class="button"><img class="svg"
-                                src="{{ url_for('static', filename='imgs/save.svg') }}"> Save Configuration</button>
+                        <button type="submit" class="button">
+                            <img class="svg" src="{{ url_for('static', filename='imgs/save.svg') }}"> Save Configuration
+                        </button>
                     </form>
-                </div>
 
+                </div>
             </div>
         </div>
-
+        <div class="container">
+            <h2>Configure Sensors</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Trigger</th>
+                        <th>Current Temperature</th>
+                        <th>Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sensor in sensors %}
+                    <tr>
+                        <form action="{{ url_for('update_sensor') }}" method="POST">
+                            <td>
+                                <input type="text" name="name" value="{{ sensor.name }}">
+                            </td>
+                            <td>
+                                <input type="number" name="trigger" value="{{ sensor.trigger }}">
+                                <input type="text" name="sensor" value="{{ sensor.sensor }}" hidden>
+                            </td>
+                            <td>
+                                {{ sensor.temperature }}°C
+                            </td>
+                            <td>
+                                <button type="submit" class="update-button">Update</button>
+                            </td>
+                        </form>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         <div class="container">
             <h2>Add phone number</h2>
             <div class="form-section">
-                <form id="phone-form">
+                <form id="phone-form" action="{{ url_for('add_phone_number') }}" method="POST">
                     <div class="input-group">
                         <div class="input-field">
                             <input type="text" id="name" name="name" placeholder="Enter Name" required>
                             <input type="tel" id="phone" name="phone" placeholder="Enter Phone number" required>
                         </div>
-
                     </div>
                     <div class="input-group">
-                        <input type="checkbox" id="daily-sms">
+                        <input type="checkbox" id="daily-sms" name="daily_sms">
                         <label>Send Daily Status Reports? </label>
                     </div>
                     <div class="input-group">
-                        <input type="checkbox" id="admin">
-                        <label>Give Administrator Privileges? </label>
+                        <input type="checkbox" id="admin" name="admin">
+                        <label>Grant Administrator Privileges? </label>
                     </div>
-
+                    <button type="submit" class="button">
+                        <img class="svg" src="{{ url_for('static', filename='imgs/add.svg') }}"> Add Number
+                    </button>
+                </form>
             </div>
-            <button type="submit" class="button"> <img class="svg"
-                    src="{{ url_for('static', filename='imgs/add.svg') }}"> Add Number</button>
-            </form>
             <table>
                 <thead>
                     <tr>
@@ -117,11 +146,31 @@
                     </tr>
                 </thead>
                 <tbody id="phone-numbers">
+                    {% for number in numbers %}
+                    <tr>
+                        <td>{{ number.name }}</td>
+                        <td>{{ number.number | format_phone_number }}</td>
+                        <td>{{ 'Yes' if number.daily_sms else 'No' }}</td>
+                        <td>{{ 'Yes' if number.admin else 'No' }}</td>
+                        <td><a href="{{ url_for('delete_number', index=loop.index) }}" class="delete-button">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-    </div>
+
+    <script>
+        document.getElementById('phone-form').addEventListener('submit', function (event) {
+            const phone = document.getElementById('phone').value;
+            const cleanedPhone = phone.replace(/\D/g, '');
+            if (cleanedPhone.length < 10) {
+                event.preventDefault();
+                alert('Phone number must be at least 10 digits long.');
+            }
+        });
+    </script>
 </body>
 
 </html>

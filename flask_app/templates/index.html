@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index-style.css') }}">
-    <script type="module" src="{{ url_for('static', filename='js/index-script.js') }}"></script>
-    <title>GSM Alarm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Lab Monitor</title>
     <meta http-equiv="refresh" content="30">
 </head>
 
@@ -14,23 +13,30 @@
     <div class="main-container">
         <div class="status">
             <div class="time" id="pi-time">
-                Loading...
+                {{ pi_time }}
             </div>
             <div class="icon">
-                <img src="{{ url_for('static', filename='imgs/signal-strength-0.svg') }}" id="signal-strength"
-                    alt="Signal">
-                <span id="signal-type">Loading...</span>
+                <img src="{{ url_for('static', filename='imgs/signal-strength-' ~ signal_strength ~ '.svg') }}"
+                    id="signal-strength" alt="Signal">
+                <span id="signal-type">{{ signal_type }}</span>
             </div>
             <div class="icon">
-                <img src="{{ url_for('static', filename='imgs/battery-1.svg') }}" id="battery-icon" alt="Signal">
-                <span id="battery">Loading...</span>
+                <img src="{{ url_for('static', filename='imgs/battery-' ~ ('charging' if power == '120V-AC' else (3 if battery > 60 else (2 if battery > 30 else 1))) ~ '.svg') }}"
+                    id="battery-icon" alt="Battery">
+                <span id="battery">{{ battery }}%</span>
             </div>
         </div>
 
         <div class="container">
             <div class="sub-container">
-                <a href="/settings" class="button"> <img class="svg"
-                        src="{{ url_for('static', filename='imgs/settings.svg') }}"> Settings </a>
+                <div class="button-container">
+                    <a href="/settings" class="button">
+                        <img class="svg" src="{{ url_for('static', filename='imgs/settings.svg') }}"> Settings
+                    </a>
+                    <a href="/help" class="button">
+                        <img class="svg" src="{{ url_for('static', filename='imgs/help.svg') }}"> Help
+                    </a>
+                </div>
                 <table>
                     <tr>
                         <th>Parameter</th>
@@ -38,53 +44,75 @@
                     </tr>
                     <tr>
                         <td>Status</td>
-                        <td id="status">Loading...</td>
+                        <td id="status"
+                            class="{{ 'status-warning' if high_temperature else ('status-warning' if power == 'UPS' else 'status-normal')}}">
+                            {{'HIGH TEMPERATURE' if high_temperature else ('Power Outage!' if power == 'UPS' else 'All
+                            Good')}}
+                        </td>
                     </tr>
                     <tr>
                         <td>Location</td>
-                        <td id="location">Loading...</td>
+                        <td>{{ location }}</td>
                     </tr>
                     <tr>
                         <td>Armed/Disarmed</td>
-                        <td id="armed">Loading...</td>
-                    </tr>
-                    <tr>
-                        <td>Trigger Temperature(°C):</td>
-                        <td id="max-temp">Loading...</td>
-                    </tr>
-                    <tr>
-                        <td>Current Temperature</td>
-                        <td id="lab-temperature">Loading...</td>
+                        <td class="{{ 'status-normal' if armed else 'status-warning' }}">
+                            {{ 'ARMED' if armed else 'DISARMED'}}
+                        </td>
                     </tr>
                     <tr>
                         <td>Hysteresis(°C):</td>
-                        <td id="hysteresis">Loading...</td>
+                        <td>{{ hys }}</td>
                     </tr>
                     <tr>
                         <td>Repeat Alerts?</td>
-                        <td id="repeat-alerts">Loading...</td>
+                        <td class="{{ 'status-normal' if repeat_alerts else 'status-warning'}}">
+                            {{ 'Yes' if repeat_alerts else 'No' }}
+                        </td>
                     </tr>
                     <tr>
                         <td>Alert Interval(minutes):</td>
-                        <td id="alert-interval">Loading...</td>
+                        <td>{{ interval if repeat_alerts else 'N/A' }}</td>
                     </tr>
                     <tr>
                         <td>Send Daily Reports?</td>
-                        <td id="send-daily-report">Loading...</td>
+                        <td class="{{ 'status-normal' if send_daily_report else 'status-warning'}}">
+                            {{ 'Yes' if send_daily_report else 'No' }}
+                        </td>
                     </tr>
                     <tr>
                         <td>Daily report time:</td>
-                        <td id="daily-report">Loading...</td>
+                        <td>{{ daily_report_time if send_daily_report else 'N/A' }}</td>
                     </tr>
                     <tr>
-                        <td>Running on </td>
-                        <td id="power">Loading...</td>
+                        <td>Power Source:</td>
+                        <td>{{ power }} Power</td>
                     </tr>
                 </table>
 
             </div>
         </div>
-
+        <div class="container">
+            <h2>Sensors</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Trigger</th>
+                        <th>Current Temperature</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sensor in sensors %}
+                    <tr>
+                        <td>{{ sensor.name }}</td>
+                        <td>{{ sensor.trigger }}°C</td>
+                        <td>{{ sensor.temperature }}°C</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         <div class="container">
             <h2>Phone Number List</h2>
             <table>
@@ -96,12 +124,18 @@
                         <th>Admin</th>
                     </tr>
                 </thead>
-                <tbody id="phone-numbers">
+                <tbody>
+                    {% for number in numbers %}
+                    <tr>
+                        <td>{{ number.name }}</td>
+                        <td>{{ number.number | format_phone_number }}</td>
+                        <td>{{ 'Yes' if number.daily_sms else 'No' }}</td>
+                        <td>{{ 'Yes' if number.admin else 'No' }}</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
-
-
     </div>
 </body>
 

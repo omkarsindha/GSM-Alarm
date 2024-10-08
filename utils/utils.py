@@ -1,7 +1,7 @@
 import re
 import time
     
-def format_phone_number(phone_number):
+def clean_phone_number(phone_number):
     # Remove any non-digit characters
     cleaned_number = re.sub(r'\D', '', phone_number)
     
@@ -15,9 +15,9 @@ def get_rdbl_time():
     """Returns current time in a readable format"""
     return time.strftime("%I:%M %p, %b %d, %Y")
     
-def is_number(n):
+def is_positive_number(n):
     try:
-        float(n)
+        n = float(n)
         return n > 0
     except ValueError:
         return False

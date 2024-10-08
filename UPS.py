@@ -8,11 +8,14 @@ class UPS():
                  
     def get_status(self) -> str:
         """Returns '120V-AC' or 'UPS' string depending on the state of the power supply to pi"""
-        status = self.ups.status.GetStatus()['data']
-        if status['powerInput'] == 'NOT_PRESENT' and status['powerInput5vIo'] == 'NOT_PRESENT':
-            return "UPS"
+        status = self.ups.status.GetStatus().get('data', None)
+        if status:
+            if status['powerInput'] == 'NOT_PRESENT' and status['powerInput5vIo'] == 'NOT_PRESENT':
+                return "UPS"
+            else:
+                return "120V-AC"
         else:
-            return "120V-AC"
+            return None
         
     def get_battery_level(self) -> int:
         """Returns the battery percentage of the UPS"""
