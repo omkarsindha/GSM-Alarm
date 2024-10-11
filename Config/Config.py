@@ -1,10 +1,10 @@
 import time
 import json
-from utils.file_utils import get_config, get_number_list, get_sensors
+from utils import file_utils
 
 
 class Config:
-    def __init__(self, config_path="Config/config.json", numbers_path="Config/numbers.json"):
+    def __init__(self):
         self.location = ""
         self.hysteresis = 0             # After reaching max temp device sends msg till drops below max temp - hys   
         self.alert_interval = 0
@@ -13,14 +13,14 @@ class Config:
         self.repeat_alerts = False
         self.numbers = []               # Acutal phone number list
         self.daily_numbers = []         # Phone Numbers who want daily report sms
-        self.numbers_list = []          # Phone Number object's list
+        self.admins = []                # Phone Numbers of admins
+        self.numbers_list = []          # Phone Number list of dicts
         self.daily_report_time = ''
-        self.config_path = config_path
-        self.numbers_path = numbers_path
         self.load_config()  
 
     def load_config(self):
-        config = get_config()
+        data = file_utils.get_data()
+        config = data.get("config",{})                # Empty dict is default
         self.location = config.get("location", self.location)
         self.hysteresis = config.get("hysteresis", self.hysteresis)
         self.alert_interval = config.get("alert_interval", self.alert_interval)*60
@@ -29,12 +29,12 @@ class Config:
         self.send_daily_report = config.get("send_daily_report", self.send_daily_report)
         self.repeat_alerts = config.get("repeat_alerts", self.repeat_alerts)
         
-        self.numbers_list = get_number_list()
+        self.numbers_list = data.get("numbers", [])   # Empty list is default
         self.numbers = [entry["number"] for entry in self.numbers_list]
         self.daily_numbers = [entry["number"] for entry in self.numbers_list if entry["daily_sms"]]
         self.admins = [entry["number"] for entry in self.numbers_list if entry["admin"]]
 
-        self.sensors = get_sensors()
+        self.sensors = data.get("sensors",{})        # Empty dict is default
 
 if __name__ == "__main__":
     config_loader = Config()
