@@ -1,14 +1,8 @@
-from flask import request, jsonify, render_template, redirect, url_for, flash
+from flask import request, jsonify, render_template, redirect, url_for
 from flask_app import app
 from monitor_instance import get_monitor
-from utils.file_utils import (
-    add_number_to_file,
-    remove_number_by_index,
-    update_config,
-    get_history_data,
-    update_sensor_data
-)
-from utils.utils import clean_phone_number
+from utils import file_utils
+from utils import utils
 import sys
 
     
@@ -26,7 +20,7 @@ def settings():
 
 @app.route("/history")
 def history():
-    history = get_history_data()
+    history = file_utils.get_history_data()
     return render_template("history.html", history=history)
 
 @app.route("/help")
@@ -43,7 +37,7 @@ def configure_alarm():
     armed = 'armed' in request.form
     repeat_alerts = 'repeat_alerts' in request.form
     
-    update_config(location, hys, interval, daily_report_time, send_daily_report, armed, repeat_alerts)  
+    file_utils.update_config(location, hys, interval, daily_report_time, send_daily_report, armed, repeat_alerts)  
     monitor = get_monitor()
     monitor.config.load_config()
     monitor.schedule_daily_status()
@@ -54,7 +48,7 @@ def update_sensor():
     sensor = request.form['sensor']
     name = request.form['name']
     trigger = request.form['trigger']
-    update_sensor_data(sensor, name, trigger)
+    file_utils.update_sensor_data(sensor, name, trigger)
     monitor = get_monitor()
     monitor.config.load_config()
     print(f"Updated {sensor} {name } {trigger}")
@@ -63,18 +57,18 @@ def update_sensor():
 @app.route('/add-phone-number', methods=['POST'])
 def add_phone_number():
     name = request.form.get('name')
-    phone = clean_phone_number(request.form.get('phone'))
+    phone = utils.clean_phone_number(request.form.get('phone'))
     daily_sms = 'daily_sms' in request.form
     admin = 'admin' in request.form
     if name and phone:
-        add_number_to_file(name, phone, daily_sms, admin)
+        file_utils.add_number_to_file(name, phone, daily_sms, admin)
         monitor = get_monitor()
         monitor.config.load_config()
     return redirect(url_for('settings'))
     
 @app.route('/delete-number/<int:index>')
 def delete_number(index):
-    remove_number_by_index(index)
+    file_utils.remove_number_by_index(index)
     monitor = get_monitor()
     monitor.config.load_config()
     return redirect(url_for('settings'))

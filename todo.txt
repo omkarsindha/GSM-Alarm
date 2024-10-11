@@ -21,11 +21,22 @@ admin number                          done
 config file methods to file utils         done
 settings thru message               done
 repeat-alerts             done
+make a help page        done
+use only the serial of the sensor          done
+update the dict to tuple or just make a dictionary      done
+kernel commands in os start up  etc/modules               done
+use one file for the config                          done
+sensor discovery different method                  done
+whenever u import                              done
+handle the error for UPS properly update the logic can return an string or integer       done
+send partition message if the message is really long                                done
+reading for which i do not have config for                      done
 
 Note : to fix network use at+cops=0
 
-test the app thoroughly, document the code and make a document for the device
-make a help page
+test the app thoroughly
+make more modular file utils 
+
 
 
 Problems I have had

@@ -2,7 +2,6 @@ import serial
 import time
 import threading
 import queue
-from typing import List, Tuple, Optional
 import traceback
 from gsmmodem.modem import GsmModem, SentSms
 from gsmmodem.exceptions import TimeoutException
@@ -20,14 +19,14 @@ class SIM7600x(threading.Thread):
         self.sms_queue: queue.Queue = queue.Queue()
         self.signal_strength = 0
         self.network_type: str = ""
-        self.lock = threading.Lock()
         
         self.modem = GsmModem(port, 115200, smsReceivedCallbackFunc=parent.handle_sms)
         self.modem.connect(None)
         self.log("Now connected to GSM modem")
-        self.modem.write("AT+CMGD=1,4")   # Delete all received messages before starting
-        self.signal_strength = self.cur_signal_strength()
-        self.network_type = self.cur_network_type()   
+        self.modem.write("AT+CMGD=1,4")                                # Delete all received messages before starting
+        
+        self.signal_strength: int = self.cur_signal_strength()         # Signal strength on scale of 1 to 4 or -1 in case of error
+        self.network_type: str = self.cur_network_type()               # Network type i.e 2G, 3G, 4G ...
         self.last_update: float = time.time()
           
     def run(self) -> None:
@@ -43,7 +42,7 @@ class SIM7600x(threading.Thread):
 
     def sms_loop(self) -> None:
         """
-        Main loop for sending SMS, receiving SMS and updating signal data.
+        Main loop for sending SMS and updating signal data.
         """
         while not self.end_event.is_set():     
             if self.last_update < time.time() - 60:
@@ -59,14 +58,17 @@ class SIM7600x(threading.Thread):
                 except Exception as e:
                     self.log(f"Failed to send SMS: {e}")
                          
-    def enqueue_sms(self, numbers: List[str], message: str) -> None:
+    def enqueue_sms(self, numbers: list[str], message: str) -> None:
         """
-        Enqueue the same message for a list of numbers 
+        Enqueue the same message for a list of numbers partitions message if it is too long 
         """
+        # Converting one message into mulitple if it is long
+        message_parts = self.partition_message(message)
         for number in numbers:
-            self.sms_queue.put((number, message))
+            for msg in message_parts:
+                self.sms_queue.put((number, msg))
     
-    def send_sms(self, phone_number: str, message: str):
+    def send_sms(self, phone_number: str, message: str) -> None:
         """
         Calls the sendSms function of the GSM modem library
         """
@@ -74,10 +76,9 @@ class SIM7600x(threading.Thread):
         self.log(message)
         try:
             self.modem.sendSms(phone_number, message)
+            self.log('SMS Sent.')
         except TimeoutException as e:
             self.log(f"Failed to send message to {phone_number}: {e}")
-            return
-        self.log('SMS Sent.')
      
     def cur_signal_strength(self) -> int:
         """
@@ -151,10 +152,41 @@ class SIM7600x(threading.Thread):
         """
         if self.debug:
             print(message)
-   
+
+    def partition_message(self, msg: str, max_length: int= 155, min_length: int = 130) -> list[str]:
+        """Partition long messages into parts breaks the message at \n or space just before max_length.
+    
+        Parameters:
+        msg (str): The long message to be partitioned.
+        max_length (int): The maximum length of each partition.
+        min_length (int): The minimum length to start looking for a newline or space. 
+        """
+        parts = []
+        start = 0
+
+        while start < len(msg):
+            end = min(start + max_length, len(msg))
+            # Try to find a \n between min_length and max_length
+            newline_pos = msg.rfind('\n', start + min_length, end)
+            if newline_pos != -1:
+                parts.append(msg[start:newline_pos])
+                start = newline_pos + 1
+            else:
+                # If no \n is found find the last space within the range
+                space_pos = msg.rfind(' ', start + min_length, end)
+                if space_pos != -1:
+                    parts.append(msg[start:space_pos])
+                    start = space_pos + 1
+                else:
+                    parts.append(msg[start:end]) # If no space is found break at max_length
+                    start = end
+
+        return parts
+
+
 if __name__ == "__main__":
     sms = SIM7600x(debug=True)
     sms.start()
-    sms.enqueue_sms(["+14374293006"], "Simple message")
+    sms.enqueue_sms(["+14374293006"], "Hello message")
     time.sleep(100)
     sms.stop()

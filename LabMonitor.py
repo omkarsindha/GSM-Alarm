@@ -4,44 +4,47 @@ from SIM7600x import SIM7600x
 from UPS import UPS
 import time
 import os
-import json
+import json 
 import threading
 import schedule
 import traceback
-from utils.utils import get_rdbl_time, is_positive_number
-from utils.file_utils import write_history, update_config
+from utils import file_utils
+from utils import utils
+import gsmmodem
 
 class LabMonitor(threading.Thread):
     """
     A class to monitor laboratory conditions including temperature and power status.
     Runs as a separate thread.
     """
-    def __init__(self, check_interval=2, debug=False, **kwargs):
+    def __init__(self, check_interval:int=2, debug:bool=False, **kwargs):
         super(LabMonitor, self).__init__(name="Monitor", **kwargs)
-
+        
         # Initialize configuration and components
-        self.config = Config(config_path="Config/config.json")
         self.sensor = TemperatureSensor()
+        file_utils.add_new_sensor(self.sensor.sensor_serials) # Add new sensor to config file
+        
+        self.config = Config()
+                
         self.ups = UPS()
         self.sms_thread = SIM7600x(parent=self, debug=debug)
         self.sms_thread.start()
-
-        self.debug = debug
-        self.check_interval = check_interval
+        
+        self.debug: bool = debug
+        self.check_interval: int = check_interval
         self.last_msg_time = time.time() - self.config.alert_interval
         self.end_event = threading.Event()
-
-
-        self.alert_sent = False
-        self.power: str = "120V-AC"    # Initial power source is 120V-AC
-        self.power_last_state: str = "120V-AC"
+        
+        
+        self.alert_sent: bool = False
+        self.power_source: str = "120V-AC"    # Initial power source is 120V-AC
         self.low_battery = False
-        self.readings =[]
-        self.sensors_above_threshold = {} # Dict of sensors as key and their temp as value (that are above threshold)
+        self.readings: dict = {}
+        self.sensors_above_threshold: dict = {} # Dict of sensors serial as key and their temp as value (that are above threshold)
 
         self.schedule_daily_status()
         self.log("Initiated an instance of monitor thread")
-
+         
     def run(self):
         """
         Main method that runs when the thread starts.
@@ -53,47 +56,45 @@ class LabMonitor(threading.Thread):
             error = str(err) if str(err) else str(err.__class__.__name__)
             self.log("Thread failed: %s" % error)
             self.log(traceback.format_exc())
-
+            
     def monitor_loop(self):
         """Main logic for Lab Monitor"""
         while not self.end_event.is_set():
             # Read current temperature and power status
-            self.readings = self.sensor.read_temp()  # List of readings in the form of [{"sys/bus/w1slave":"xx"}, ...]
-            # Get UPS power status either '120V-AC', 'UPS', or 'Error'.
-            self.power = self.ups.get_status()
+            self.readings = self.sensor.get_readings()  # Dict of sensor serial and its temp {"xxx":xx, ...}
+            power = self.ups.get_power_source()  # 120V-AC or UPS or None if error
 
-            self.log(f"Status (Temperature Readings: {self.readings} || Power: {self.power})")
+            self.log(f"Status (Temperature Readings: {self.readings} || Power: {power})")
 
             if self.config.armed:  # If the Alarm is active
                 cur_time = time.time()
-
+                
                 # Process each sensors reading to check if the temperature is above the trigger threshold
-                for reading in self.readings:
-                    # The key is the sensor filename and value is degrees C.
-                    sensor_path, temperature = list(reading.items())[0]  # Unpack the dict
-                    if sensor_path in self.config.sensors:
-                        trigger = self.config.sensors[sensor_path]['trigger']
+                for sensor_serial in self.readings:    # Looping through the keys i.e sensor serial
+                    temperature = self.readings[sensor_serial]
+                    if sensor_serial in self.config.sensors:
+                        trigger = self.config.sensors[sensor_serial]['trigger']
                         if temperature > trigger:
-                            self.sensors_above_threshold[sensor_path] = {
+                            self.sensors_above_threshold[sensor_serial] = {
                                 "temperature": temperature,
-                                "name": self.config.sensors[sensor_path]['name']
-                            }
+                                "name": self.config.sensors[sensor_serial]['name']
+                            }  
 
                 # Check if temperature has returned to normal
-                for reading in self.readings:
-                    sensor_path, temperature = list(reading.items())[0]
-                    if sensor_path in self.sensors_above_threshold:
-                        trigger = self.config.sensors[sensor_path]['trigger']
+                for sensor_serial in self.readings:     # Looping through the keys i.e sensor serial
+                    temperature = self.readings[sensor_serial]
+                    if sensor_serial in self.sensors_above_threshold:
+                        trigger = self.config.sensors[sensor_serial]['trigger']
                         if temperature < trigger - self.config.hysteresis:
-                            self.log(f"{self.sensors_above_threshold[sensor_path].get('name')} is back to normal temperature")
-                            del self.sensors_above_threshold[sensor_path]                     # Delete it from the list
-
-                            if not self.sensors_above_threshold:     # Only if sensor list gets empty send back to normal message
-                                self.log("Sending temperature back to normal message")
+                            self.log(f"{self.sensors_above_threshold[sensor_serial].get('name')} is back to normal temperature")
+                            del self.sensors_above_threshold[sensor_serial]                     # Delete it from the list
+                            
+                            if not self.sensors_above_threshold:     # Only if sensor list gets empty send back to normal message    
+                                self.log("Sending temperature back to normal message")       
                                 self.alert_sent = False
-                                msg = f"Alert Resolved\n\nTemperature is back to normal :)\n\nLocation: {self.config.location} \nTime: {get_rdbl_time()}"
+                                msg = f"Alert Resolved\n\nTemperature is back to normal :)\n\nLocation: {self.config.location} \nTime: {utils.get_rdbl_time()}"
                                 self.sms_thread.enqueue_sms(self.config.numbers, msg)
-                                write_history("Temperature back to normal")
+                                file_utils.write_history("Temperature back to normal")
 
                 # Send alert if temperature is still high after alert interval
                 cur_time = time.time()
@@ -107,38 +108,38 @@ class LabMonitor(threading.Thread):
                         sensor_details = "\n".join(
                             [f"{info['name']}: {info['temperature']}°C" for info in self.sensors_above_threshold.values()]
                         )
-                        msg = f"Alert\n\nSensors Above threshold:\n{sensor_details}\n\nLocation: {self.config.location}\nTime: {get_rdbl_time()}"
-
+                        msg = f"Alert\n\nHigh temperature\n\nSensors Above threshold\n{sensor_details}\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
                         self.sms_thread.enqueue_sms(self.config.numbers, msg)
-                        write_history("High temperature")
-
+                        file_utils.write_history("High temperature")
+                    
                 # Handle changes in power source
-                if self.power != self.power_last_state:
-                    self.log("Sending power type changed message")
-                    if self.power_last_state == "120V-AC":
-                        msg = f"Alert\n\nPower lost, running on battery power\n\nLocation: {self.config.location}\nTime: {get_rdbl_time()}"
-                    else:
-                        msg = f"Alert Resolved\n\nPower has been recovered :)\n\nLocation: {self.config.location}\nTime: {get_rdbl_time()}"
-                    self.low_battery = False
-                    self.power_last_state = self.power
-                    self.sms_thread.enqueue_sms(self.config.numbers, msg)
-                    write_history(f"Power changed to {self.power}")
-
-                # Case when battery is low
-                if self.power == "UPS":
-                    # NOTE: get_battery_level might return a string which will throw an exception if compared to an integer.
-                    percentage = self.ups.get_battery_level()
-                    if percentage <= 80 and self.low_battery == False:
-                        self.log("Sending low battery message")
-                        msg = f"Alert\n\nBattery is less than 10%\n\nLocation: {self.config.location}\nTime: {get_rdbl_time()}"
+                if power:     # Checking for None
+                    if power != self.power_source:
+                        self.power_source = power
+                        self.log("Sending power type changed message")
+                        if self.power_source == "120V-AC":
+                            msg = f"Alert\n\nPower lost, running on battery power\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
+                        else:
+                            msg = f"Alert Resolved\n\nPower has been recovered :)\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
+                        self.low_battery = False           # As, if UPS to GRID then Not low battery, else if GRID to UPS then we want to send low battery msg 
                         self.sms_thread.enqueue_sms(self.config.numbers, msg)
-                        write_history("Low battery")
-                        self.low_battery = True
-
+                        file_utils.write_history(f"Power changed to {power}")
+                        
+                # Case when battery is low 
+                if power == "UPS":
+                    percentage = self.ups.get_battery_level()
+                    if percentage:     # Checking for None
+                        if percentage <= 20 and self.low_battery == False:
+                            self.log("Sending low battery message")
+                            msg = f"Alert\n\nBattery is less than 20%\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
+                            self.sms_thread.enqueue_sms(self.config.numbers, msg)
+                            file_utils.write_history("Low battery")
+                            self.low_battery = True
+                    
                 # Run any scheduled daily status reports
                 schedule.run_pending()
             time.sleep(self.check_interval)
-
+            
     def stop(self, block=False):
         """
         Signal the thread to end. Block only if block=True.
@@ -147,50 +148,51 @@ class LabMonitor(threading.Thread):
         self.sms_thread.stop()
         if block:
             self.join()
-
-    def get_config(self):
+            
+    def get_config(self) -> dict:  
         """
-        Get all the information from Config, SIM7600x and Monitor
+        Get all the information from Config, SIM7600x and Monitor in form of a dictionary
         """
         network_type = self.sms_thread.network_type
         signal_strength = self.sms_thread.signal_strength
-
+        battery = self.ups.get_battery_level()
+        battery = 0 if not battery else battery
         # Config might have old sensors so filtering it to get only the ones available in the latest readings
-        sensor_files = {sensor_path for reading in self.readings for sensor_path in reading.keys()}
-        filtered_sensors = {sensor_path: info for sensor_path, info in self.config.sensors.items() if sensor_path in sensor_files}
+        sensor_serials = list(self.readings.keys())                               
+        filtered_sensors = {sensor_serial: info for sensor_serial, info in self.config.sensors.items() if sensor_serial in sensor_serials}
 
         # Initialize the intersection list
         intersection = []
-        for reading in self.readings:
-            sensor_path, temperature = list(reading.items())[0]
-            if sensor_path in filtered_sensors:
-                sensor_info = filtered_sensors[sensor_path]
+        for sensor_serial in self.readings:
+            temperature = self.readings[sensor_serial]
+            if sensor_serial in filtered_sensors:
+                sensor_info = filtered_sensors[sensor_serial]
                 combined_info = {
                     "name": sensor_info["name"],
-                    "sensor": sensor_path,
+                    "sensor": sensor_serial,
                     "trigger": sensor_info["trigger"],
                     "temperature": temperature
                 }
                 intersection.append(combined_info)
-
+            
         return {
-                "high_temperature": bool(self.sensors_above_threshold),
+                "high_temperature": bool(self.sensors_above_threshold), 
                 "location": self.config.location,
-                "hys": self.config.hysteresis,
-                "interval": self.config.alert_interval / 60,
+                "hys": self.config.hysteresis, 
+                "interval": self.config.alert_interval / 60, 
                 "daily_report_time": self.config.daily_report_time,
                 "armed": self.config.armed,
                 "send_daily_report": self.config.send_daily_report,
                 "repeat_alerts": self.config.repeat_alerts,
-                "signal_strength": signal_strength,
-                "signal_type": network_type,
-                "pi_time": time.strftime("%B %d  %H:%M"),
+                "signal_strength": signal_strength, 
+                "signal_type": network_type, 
+                "pi_time": utils.get_rdbl_time(),  
                 "numbers": self.config.numbers_list,
-                "power": self.power,
+                "power": self.power_source,
                 "battery": self.ups.get_battery_level(),
                 "sensors": intersection
                 }
-
+    
     def schedule_daily_status(self):
         """
         Schedules the daily report SMS
@@ -206,42 +208,43 @@ class LabMonitor(threading.Thread):
         """
         if self.config.send_daily_report:
             self.log("Sent daily status message")
-            msg = f"Daily Report\n\nLocation: {self.config.location}\nTime: {get_rdbl_time()}"
+            msg = f"Daily Report\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
             self.sms_thread.enqueue_sms(self.config.daily_numbers, msg)
-            write_history("Daily report")
-
+            file_utils.write_history("Daily report")
+            
     def log(self, message):
         """
         Logs a message if debug mode is enabled
         """
         if self.debug:
             print(message)
-
-    def handle_sms(self, sms):
+            
+    def handle_sms(self, sms: gsmmodem.modem.ReceivedSms):
         """
         Replies to SMS by the users of the Monitor after Authenticating and Authorizing
         """
         text = sms.text.lower().strip()
         num = sms.number
+        print(type(sms))
         if num in self.config.numbers:  # Check if the message came from the list of numbers in the database
             name = ''
             for contact in self.config.numbers_list:        # Getting the name corresponding to the number
                  if contact['number'] == num:
                     name = contact['name']
-
+        
             if text == 'status':  # Same for admin and normal users
                 config = self.get_config()
                 armed = 'Armed' if config['armed'] else 'Disarmed'
                 repeat_alerts = f"Alert Interval: {int(config['interval'])} minutes" if config['repeat_alerts'] else f"Repeat Alerts: {config['repeat_alerts']}"
                 message = f"Arm/Disarm: {armed}\nPower: {config['power']}\n{repeat_alerts}"
                 self.sms_thread.enqueue_sms([num], message)
-                write_history(f"Status request by {name}")
+                file_utils.write_history(f"Status request by {name}")
                 return
 
             if text == 'time':  # Same for admin and normal users
-                message = f"Time: {get_rdbl_time()}"
+                message = f"Time: {utils.get_rdbl_time()}"
                 self.sms_thread.enqueue_sms([num], message)
-                write_history(f"Time request by {name}")
+                file_utils.write_history(f"Time request by {name}")
                 return
 
             if text == 'help':
@@ -249,7 +252,7 @@ class LabMonitor(threading.Thread):
                 normal_help = "1. status\n2. time"
                 help_message = admin_help if num in self.config.admins else normal_help   # Seperate for both
                 self.sms_thread.enqueue_sms([num], help_message)
-                write_history(f"Help request by {name}")
+                file_utils.write_history(f"Help request by {name}")
                 return
 
             if num in self.config.admins:  # Additional commands for admin users
@@ -258,32 +261,32 @@ class LabMonitor(threading.Thread):
                     if parts[0] == 'set' and parts[1] == 'repeat-alerts' and parts[2] in ['on', 'off']:
                         status = parts[2].lower()
                         if status == 'on':
-                            update_config(repeat_alerts = True)
+                            file_utils.update_config(repeat_alerts = True)  
                         else:
-                            update_config(repeat_alerts = False)
+                            file_utils.update_config(repeat_alerts = False)  
                         self.sms_thread.enqueue_sms([num], f"Repeat-Alerts set to '{status}'.")
-                        write_history(f"Repeat-Alerts set to '{status}' by {name}")
-
-                    elif parts[0] == 'set' and parts[1] == 'alert-interval' and is_positive_number(parts[2]):
+                        file_utils.write_history(f"Repeat-Alerts set to '{status}' by {name}")
+                        
+                    elif parts[0] == 'set' and parts[1] == 'alert-interval' and utils.is_positive_number(parts[2]):
                         interval = int(parts[2])
-                        update_config(interval = interval)
+                        file_utils.update_config(interval = interval) 
                         self.sms_thread.enqueue_sms([num], f"Alert interval set to {interval} minutes")
-                        write_history(f"Alert interval set to {interval} minutes by {name}")
-
+                        file_utils.write_history(f"Alert interval set to {interval} minutes by {name}")                       
+                        
                     else:
                         self.sms_thread.enqueue_sms([num], "Invalid value for repeat-alerts. Please enter 'on' or 'off'.")
-                        write_history(f"Invalid command sent by {name}")
-                    return
+                        file_utils.write_history(f"Invalid command sent by {name}")
+                    return 
 
             self.sms_thread.enqueue_sms([num], "Invalid command. Send 'help' for more details.")
-            write_history(f"Invalid command sent by {name}")
+            file_utils.write_history(f"Invalid command sent by {name}")
 
-
-
-
+            
+           
+        
 if __name__ == "__main__":
     # Create and start a LabMonitor instance for testing
     monitor = LabMonitor(debug=True)
     monitor.start()
-    time.sleep(60)
+    time.sleep(60)  
     monitor.stop()
