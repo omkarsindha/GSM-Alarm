@@ -94,5 +94,605 @@
     {
         "event": "Daily report",
         "time": "03:24 PM, Oct 10, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "11:39 AM, Oct 11, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "11:40 AM, Oct 11, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "11:40 AM, Oct 11, 2024"
+    },
+    {
+        "event": "Daily report",
+        "time": "11:43 AM, Oct 11, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "11:43 AM, Oct 11, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "11:44 AM, Oct 11, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "11:47 AM, Oct 11, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "11:48 AM, Oct 11, 2024"
+    },
+    {
+        "event": "Daily report",
+        "time": "11:50 AM, Oct 11, 2024"
+    },
+    {
+        "event": "Daily report",
+        "time": "11:53 AM, Oct 11, 2024"
+    },
+    {
+        "event": "Daily report",
+        "time": "11:54 AM, Oct 11, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "12:10 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "12:11 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Power changed to 120V-AC",
+        "time": "12:12 PM, Oct 11, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:30 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "01:31 PM, Oct 11, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:34 PM, Oct 11, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:37 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "01:37 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "01:38 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "01:41 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Help request by Omkarsinh Sindha",
+        "time": "01:42 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Help request by Pedro",
+        "time": "01:53 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Status request by Pedro",
+        "time": "01:54 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Help request by Omkarsinh Sindha",
+        "time": "02:11 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "02:11 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "02:37 PM, Oct 11, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:49 PM, Oct 11, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:52 PM, Oct 11, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "03:10 PM, Oct 11, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "03:13 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "03:13 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "03:15 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Help request by Omkarsinh Sindha",
+        "time": "03:24 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Help request by Omkarsinh Sindha",
+        "time": "03:46 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Help request by Omkarsinh Sindha",
+        "time": "03:48 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "03:48 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Help request by Pedro",
+        "time": "03:57 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Status request by Pedro",
+        "time": "03:57 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "03:58 PM, Oct 11, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "08:46 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to 120V-AC",
+        "time": "08:46 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "08:47 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to 120V-AC",
+        "time": "08:47 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "08:47 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to 120V-AC",
+        "time": "08:47 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "08:48 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to 120V-AC",
+        "time": "08:50 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Help request by Omkarsinh Sindha",
+        "time": "09:39 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Invalid command sent by Omkarsinh Sindha",
+        "time": "09:41 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Help request by Omkarsinh Sindha",
+        "time": "09:41 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "10:26 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "10:27 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "10:33 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "10:46 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "10:48 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "10:49 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Help request by Omkarsinh Sindha",
+        "time": "10:53 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "10:54 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Time request by Omkarsinh Sindha",
+        "time": "10:54 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "10:55 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to 120V-AC",
+        "time": "10:55 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "11:22 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to 120V-AC",
+        "time": "11:22 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "11:26 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to 120V-AC",
+        "time": "11:26 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Help request by Omkarsinh Sindha",
+        "time": "11:26 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Pedro",
+        "time": "11:27 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Help request by Omkarsinh Sindha",
+        "time": "11:31 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "11:31 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "11:32 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "11:42 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to 120V-AC",
+        "time": "11:42 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "11:42 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "11:42 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "11:43 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "11:43 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to 120V-AC",
+        "time": "11:43 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "11:44 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Power changed to UPS",
+        "time": "11:44 AM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "11:49 AM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "11:50 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "11:50 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "11:55 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "11:57 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Pedro",
+        "time": "11:57 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Daily report",
+        "time": "11:59 AM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Pedro",
+        "time": "12:03 PM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Pedro",
+        "time": "12:03 PM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Pedro",
+        "time": "12:43 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:38 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:39 PM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "01:40 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:40 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:41 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:42 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:43 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:44 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:45 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:46 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:47 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:48 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:49 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:50 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:51 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:52 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:53 PM, Oct 15, 2024"
+    },
+    {
+        "event": "Help request by Omkarsinh Sindha",
+        "time": "01:53 PM, Oct 15, 2024"
+    },
+    {
+        "event": "Repeat-Alerts set to 'off' by Omkarsinh Sindha",
+        "time": "01:54 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:54 PM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "01:55 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:55 PM, Oct 15, 2024"
+    },
+    {
+        "event": "Alert interval set to 60 minutes by Omkarsinh Sindha",
+        "time": "01:56 PM, Oct 15, 2024"
+    },
+    {
+        "event": "Status request by Omkarsinh Sindha",
+        "time": "01:56 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:56 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:57 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "01:58 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:00 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:01 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:02 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:03 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:04 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:05 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:06 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:07 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:08 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:09 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:10 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:11 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:12 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:13 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:14 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:15 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:16 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:17 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:18 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:19 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:20 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:21 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:22 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:23 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:24 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:25 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:26 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:27 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:28 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:29 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:31 PM, Oct 15, 2024"
+    },
+    {
+        "event": "High temperature",
+        "time": "02:32 PM, Oct 15, 2024"
+    },
+    {
+        "event": "Temperature back to normal",
+        "time": "02:32 PM, Oct 15, 2024"
     }
 ]

@@ -3,8 +3,8 @@ import time
 import threading
 import queue
 import traceback
-from gsmmodem.modem import GsmModem, SentSms
-from gsmmodem.exceptions import TimeoutException
+import gsmmodem
+from systemd import journal
 
 class SIM7600x(threading.Thread):
     """
@@ -20,7 +20,7 @@ class SIM7600x(threading.Thread):
         self.signal_strength = 0
         self.network_type: str = ""
         
-        self.modem = GsmModem(port, 115200, smsReceivedCallbackFunc=parent.handle_sms)
+        self.modem = gsmmodem.modem.GsmModem(port, 115200, smsReceivedCallbackFunc=parent.handle_sms)
         self.modem.connect(None)
         self.log("Now connected to GSM modem")
         self.modem.write("AT+CMGD=1,4")                                # Delete all received messages before starting
@@ -63,28 +63,34 @@ class SIM7600x(threading.Thread):
         Enqueue the same message for a list of numbers partitions message if it is too long 
         """
         # Converting one message into mulitple if it is long
+        self.log(f"Sending messages to {numbers} Text:")
+        self.log(message)
         message_parts = self.partition_message(message)
         for number in numbers:
             for msg in message_parts:
                 self.sms_queue.put((number, msg))
     
-    def send_sms(self, phone_number: str, message: str) -> None:
+    def send_sms(self, phone_number: str, message: str, retries=3, delay=2) -> None:
         """
-        Calls the sendSms function of the GSM modem library
+        Calls the sendSms function of the GSM modem library, re-sends message 3 times before failing.
         """
-        self.log(f"Sending message to {phone_number} Text:")
-        self.log(message)
-        try:
-            self.modem.sendSms(phone_number, message)
-            self.log('SMS Sent.')
-        except TimeoutException as e:
-            self.log(f"Failed to send message to {phone_number}: {e}")
+        for i in range(retries):
+            try:
+                self.modem.sendSms(phone_number, message)
+            except gsmmodem.exceptions.TimeoutException as e:
+                self.log(f"Failed to send message to {phone_number}: {str(e)}. Attempt {i+1}")
+                time.sleep(delay)
+            else:
+                self.log(f'SMS Sent to {phone_number}.')
+                break
+        else:
+            self.log(f"Failed to send message to {phone_number} after {retries} attempts.")
      
     def cur_signal_strength(self) -> int:
         """
         Interprets the signal quality from the CSQ command output.
         
-        :return: Interpreted signal strength on a scale of 0-4 (-1 Means Error)
+        :return: Interpreted signal strength on a scale of 0-4 
         """
         try:
             csq_output = self.modem.write("AT+CSQ")[0]
@@ -101,12 +107,12 @@ class SIM7600x(threading.Thread):
                 elif 20 <= rssi <= 31:
                     return 4
                 else:
-                    return -1
+                    return 0
             else:
-                return -1
+                return 0
         except Exception as e:
             self.log(f"Failed to get signal strength: {e}")
-            return -1
+            return 0
         
     def cur_network_type(self) -> str:
         """
@@ -151,6 +157,7 @@ class SIM7600x(threading.Thread):
         :param message: Message to log
         """
         if self.debug:
+            journal.send(message)
             print(message)
 
     def partition_message(self, msg: str, max_length: int= 155, min_length: int = 130) -> list[str]:
