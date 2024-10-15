@@ -2,28 +2,34 @@
     "config": {
         "location": "Sand Box",
         "hysteresis": 1,
-        "alert_interval": 1,
-        "daily_report_time": "15:24",
+        "alert_interval": 60,
+        "daily_report_time": "11:59",
         "armed": true,
         "send_daily_report": true,
-        "repeat_alerts": true
+        "repeat_alerts": false
     },
     "sensors": {
         "3c01d60779ab": {
-            "name": "Hot Zone",
-            "trigger": 30
+            "name": "Hot Zon",
+            "trigger": 32
         },
         "00000d79538b": {
-            "name": "Cold Zone",
-            "trigger": 28
+            "name": "Sensor A",
+            "trigger": 30
         }
     },
     "numbers": [
         {
             "name": "Omkarsinh Sindha",
             "number": "+14374293006",
-            "daily_sms": false,
-            "admin": false
+            "daily_sms": true,
+            "admin": true
+        },
+        {
+            "name": "Pedro",
+            "number": "+19055168909",
+            "daily_sms": true,
+            "admin": true
         }
     ]
 }

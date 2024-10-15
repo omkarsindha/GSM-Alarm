@@ -11,6 +11,8 @@ import traceback
 from utils import file_utils
 from utils import utils
 import gsmmodem
+from systemd import journal
+
 
 class LabMonitor(threading.Thread):
     """
@@ -32,7 +34,8 @@ class LabMonitor(threading.Thread):
         
         self.debug: bool = debug
         self.check_interval: int = check_interval
-        self.last_msg_time = time.time() - self.config.alert_interval
+        self.last_temp_msg = time.time() - self.config.alert_interval
+        self.last_power_msg = time.time() - self.config.alert_interval
         self.end_event = threading.Event()
         
         
@@ -98,10 +101,10 @@ class LabMonitor(threading.Thread):
 
                 # Send alert if temperature is still high after alert interval
                 cur_time = time.time()
-                if cur_time - self.last_msg_time > self.config.alert_interval and self.sensors_above_threshold:
+                if cur_time - self.last_temp_msg > self.config.alert_interval and self.sensors_above_threshold:
                     if self.config.repeat_alerts or not self.alert_sent: # Check if repeat alerts is on or alert is already sent
                         self.log("Sending High Temperature Message")
-                        self.last_msg_time = time.time()
+                        self.last_temp_msg = time.time()
                         self.alert_sent = True
 
                         # Build the message with sensor names and their temperatures
@@ -113,17 +116,24 @@ class LabMonitor(threading.Thread):
                         file_utils.write_history("High temperature")
                     
                 # Handle changes in power source
-                if power:     # Checking for None
+                if power is not None:     # Checking for None
                     if power != self.power_source:
-                        self.power_source = power
-                        self.log("Sending power type changed message")
-                        if self.power_source == "120V-AC":
-                            msg = f"Alert\n\nPower lost, running on battery power\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
-                        else:
-                            msg = f"Alert Resolved\n\nPower has been recovered :)\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
-                        self.low_battery = False           # As, if UPS to GRID then Not low battery, else if GRID to UPS then we want to send low battery msg 
-                        self.sms_thread.enqueue_sms(self.config.numbers, msg)
                         file_utils.write_history(f"Power changed to {power}")
+                        if power == "UPS":
+                            msg = f"Alert\n\nPower lost, running on battery power\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
+                            if cur_time - self.last_power_msg > self.config.alert_interval:
+                                self.log("Sending power lost message")
+                                self.last_power_msg = time.time()
+                                self.power_source = power
+                                self.sms_thread.enqueue_sms(self.config.numbers, msg)
+                        else:   # power is changed to GRID
+                            msg = f"Alert Resolved\n\nPower has been recovered :)\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
+                            self.log("Sending power recovered message")
+                            self.last_power_msg = time.time()
+                            self.power_source = power
+                            self.sms_thread.enqueue_sms(self.config.numbers, msg)
+                                
+                        self.low_battery = False           # As; if UPS to GRID then Not low battery, else if GRID to UPS then we want to send low battery msg
                         
                 # Case when battery is low 
                 if power == "UPS":
@@ -217,6 +227,7 @@ class LabMonitor(threading.Thread):
         Logs a message if debug mode is enabled
         """
         if self.debug:
+            journal.send(message)
             print(message)
             
     def handle_sms(self, sms: gsmmodem.modem.ReceivedSms):
@@ -225,7 +236,6 @@ class LabMonitor(threading.Thread):
         """
         text = sms.text.lower().strip()
         num = sms.number
-        print(type(sms))
         if num in self.config.numbers:  # Check if the message came from the list of numbers in the database
             name = ''
             for contact in self.config.numbers_list:        # Getting the name corresponding to the number
@@ -234,9 +244,15 @@ class LabMonitor(threading.Thread):
         
             if text == 'status':  # Same for admin and normal users
                 config = self.get_config()
+                signal_strength = config['signal_strength']
                 armed = 'Armed' if config['armed'] else 'Disarmed'
                 repeat_alerts = f"Alert Interval: {int(config['interval'])} minutes" if config['repeat_alerts'] else f"Repeat Alerts: {config['repeat_alerts']}"
-                message = f"Arm/Disarm: {armed}\nPower: {config['power']}\n{repeat_alerts}"
+                
+                sensor_details = "\n".join(
+                            [f"{self.config.sensors[key]['name']}: {self.readings[key]}°C" for key in self.readings]
+                        )
+                
+                message = f"Arm/Disarm: {armed}\nSignal Strength:{signal_strength}(0-4)\nPower: {config['power']}\n{sensor_details}\n{repeat_alerts}"
                 self.sms_thread.enqueue_sms([num], message)
                 file_utils.write_history(f"Status request by {name}")
                 return
