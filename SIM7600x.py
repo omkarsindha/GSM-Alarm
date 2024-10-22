@@ -5,6 +5,8 @@ import queue
 import traceback
 import gsmmodem
 from systemd import journal
+import traceback
+
 
 class SIM7600x(threading.Thread):
     """
@@ -21,9 +23,8 @@ class SIM7600x(threading.Thread):
         self.network_type: str = ""
         
         self.modem = gsmmodem.modem.GsmModem(port, 115200, smsReceivedCallbackFunc=parent.handle_sms)
-        self.modem.connect(None)
+        self.modem.connect(None,5)
         self.log("Now connected to GSM modem")
-        self.modem.write("AT+CMGD=1,4")                                # Delete all received messages before starting
         
         self.signal_strength: int = self.cur_signal_strength()         # Signal strength on scale of 1 to 4 or -1 in case of error
         self.network_type: str = self.cur_network_type()               # Network type i.e 2G, 3G, 4G ...
@@ -44,19 +45,18 @@ class SIM7600x(threading.Thread):
         """
         Main loop for sending SMS and updating signal data.
         """
-        while not self.end_event.is_set():     
-            if self.last_update < time.time() - 60:
-                self.signal_strength = self.cur_signal_strength()
-                self.network_type = self.cur_network_type()       
-                self.last_update = time.time() 
+        while not self.end_event.is_set():      
             while not self.sms_queue.empty():
                 try:
                     number, msg = self.sms_queue.get_nowait()
                     self.send_sms(number, msg)
                 except queue.Empty:
                     break
-                except Exception as e:
-                    self.log(f"Failed to send SMS: {e}")
+            
+            if self.last_update < time.time() - 60:
+                self.signal_strength = self.cur_signal_strength()
+                self.network_type = self.cur_network_type()       
+                self.last_update = time.time() 
                          
     def enqueue_sms(self, numbers: list[str], message: str) -> None:
         """
@@ -64,8 +64,8 @@ class SIM7600x(threading.Thread):
         """
         # Converting one message into mulitple if it is long
         self.log(f"Sending messages to {numbers} Text:")
-        self.log(message)
         message_parts = self.partition_message(message)
+        self.log('+\n'.join(message_parts))
         for number in numbers:
             for msg in message_parts:
                 self.sms_queue.put((number, msg))
@@ -74,17 +74,24 @@ class SIM7600x(threading.Thread):
         """
         Calls the sendSms function of the GSM modem library, re-sends message 3 times before failing.
         """
-        for i in range(retries):
-            try:
-                self.modem.sendSms(phone_number, message)
-            except gsmmodem.exceptions.TimeoutException as e:
-                self.log(f"Failed to send message to {phone_number}: {str(e)}. Attempt {i+1}")
-                time.sleep(delay)
-            else:
-                self.log(f'SMS Sent to {phone_number}.')
-                break
-        else:
-            self.log(f"Failed to send message to {phone_number} after {retries} attempts.")
+        try:
+            self.modem.sendSms(phone_number, message)
+            self.log(f'SMS Sent to {phone_number}.')
+        except gsmmodem.exceptions.TimeoutException as e:
+            self.log(f"Failed to send message to {phone_number}: {str(e)}.")
+            self.log(traceback.format_exc())
+            
+        # for i in range(retries):
+        #     try:
+        #         self.modem.sendSms(phone_number, message)
+        #     except gsmmodem.exceptions.TimeoutException as e:
+        #         self.log(f"Failed to send message to {phone_number}: {str(e)}. Attempt {i+1}")
+        #         time.sleep(delay)
+        #     else:
+        #         self.log(f'SMS Sent to {phone_number}.')
+        #         break
+        # else:
+        #     self.log(f"Failed to send message to {phone_number} after {retries} attempts.")
      
     def cur_signal_strength(self) -> int:
         """
@@ -133,10 +140,10 @@ class SIM7600x(threading.Thread):
             elif "NR" in cpsi_output:
                 return "5G"
             else:
-                return "Unknown"
+                return "X"
         except Exception as e:
             self.log(f"Failed to get network type: {e}")
-            return "Unknown"
+            return "X"
 
     def stop(self, block: bool = False) -> None:
         """
@@ -158,7 +165,6 @@ class SIM7600x(threading.Thread):
         """
         if self.debug:
             journal.send(message)
-            print(message)
 
     def partition_message(self, msg: str, max_length: int= 155, min_length: int = 130) -> list[str]:
         """Partition long messages into parts breaks the message at \n or space just before max_length.

@@ -1,21 +1,17 @@
 {
     "config": {
-        "location": "Sand Box",
+        "location": "ORT LAB",
         "hysteresis": 1,
-        "alert_interval": 60,
-        "daily_report_time": "11:59",
+        "alert_interval": 30,
+        "daily_report_time": "15:46",
         "armed": true,
         "send_daily_report": true,
-        "repeat_alerts": false
+        "repeat_alerts": true
     },
     "sensors": {
-        "3c01d60779ab": {
-            "name": "Hot Zon",
-            "trigger": 32
-        },
         "00000d79538b": {
             "name": "Sensor A",
-            "trigger": 30
+            "trigger": 31
         }
     },
     "numbers": [

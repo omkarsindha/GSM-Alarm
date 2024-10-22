@@ -1,13 +1,6 @@
 import json
+from LabMonitor import LabMonitor
 
-data = {
-    "name": "John Doe",
-    "age": 30,
-    "city": "Burlington"
-}
 
-try:
-    with open('data.json', 'w') as file:
-        json.dump(data, file, indent=4)
-except:
-    print("JI file not found")
+monitor = LabMonitor()
+print(monitor.handle_message(("+14374293006","Help")))

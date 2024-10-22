@@ -13,7 +13,7 @@ def clean_phone_number(phone_number):
     
 def get_rdbl_time():
     """Returns current time in a readable format"""
-    return time.strftime("%I:%M %p, %b %d, %Y")
+    return time.strftime("%I:%M %p, %b %d")
     
 def is_positive_number(n):
     try:
