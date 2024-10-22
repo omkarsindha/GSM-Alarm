@@ -1,6 +1,6 @@
 from Config.Config import Config
 from TemperatureSensor import TemperatureSensor
-from SIM7600x import SIM7600x
+from SIM7600xold import SIM7600x
 from UPS import UPS
 import time
 import os
@@ -12,14 +12,14 @@ from utils import file_utils
 from utils import utils
 import gsmmodem
 from systemd import journal
-
+from SIM7600xold import SMSMessage
 
 class LabMonitor(threading.Thread):
     """
     A class to monitor laboratory conditions including temperature and power status.
     Runs as a separate thread.
     """
-    def __init__(self, check_interval:int=2, debug:bool=False, **kwargs):
+    def __init__(self, check_interval:int=5, debug:bool=False, **kwargs):
         super(LabMonitor, self).__init__(name="Monitor", **kwargs)
         
         # Initialize configuration and components
@@ -95,7 +95,7 @@ class LabMonitor(threading.Thread):
                             if not self.sensors_above_threshold:     # Only if sensor list gets empty send back to normal message    
                                 self.log("Sending temperature back to normal message")       
                                 self.alert_sent = False
-                                msg = f"Alert Resolved\n\nTemperature is back to normal :)\n\nLocation: {self.config.location} \nTime: {utils.get_rdbl_time()}"
+                                msg = f"Alert Resolved\n\nTemperature is back to normal on {utils.get_rdbl_time()} :)\n\nLocation: {self.config.location}"
                                 self.sms_thread.enqueue_sms(self.config.numbers, msg)
                                 file_utils.write_history("Temperature back to normal")
 
@@ -109,9 +109,9 @@ class LabMonitor(threading.Thread):
 
                         # Build the message with sensor names and their temperatures
                         sensor_details = "\n".join(
-                            [f"{info['name']}: {info['temperature']}°C" for info in self.sensors_above_threshold.values()]
+                            [f"{info['name']}: {info['temperature']} C" for info in self.sensors_above_threshold.values()]
                         )
-                        msg = f"Alert\n\nHigh temperature\n\nSensors Above threshold\n{sensor_details}\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
+                        msg = f"Alert\n\nHigh temperature on {utils.get_rdbl_time()}\n\nSensors Above threshold\n{sensor_details}\n\nLocation: {self.config.location}"
                         self.sms_thread.enqueue_sms(self.config.numbers, msg)
                         file_utils.write_history("High temperature")
                     
@@ -120,20 +120,18 @@ class LabMonitor(threading.Thread):
                     if power != self.power_source:
                         file_utils.write_history(f"Power changed to {power}")
                         if power == "UPS":
-                            msg = f"Alert\n\nPower lost, running on battery power\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
+                            msg = f"Alert\n\nPower lost on {utils.get_rdbl_time()}, running on battery power\n\nLocation: {self.config.location}"
                             if cur_time - self.last_power_msg > self.config.alert_interval:
                                 self.log("Sending power lost message")
                                 self.last_power_msg = time.time()
                                 self.power_source = power
                                 self.sms_thread.enqueue_sms(self.config.numbers, msg)
                         else:   # power is changed to GRID
-                            msg = f"Alert Resolved\n\nPower has been recovered :)\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
+                            msg = f"Alert Resolved\n\nPower has been recovered on {utils.get_rdbl_time()} :)\n\nLocation: {self.config.location}"
                             self.log("Sending power recovered message")
                             self.last_power_msg = time.time()
                             self.power_source = power
                             self.sms_thread.enqueue_sms(self.config.numbers, msg)
-                                
-                        self.low_battery = False           # As; if UPS to GRID then Not low battery, else if GRID to UPS then we want to send low battery msg
                         
                 # Case when battery is low 
                 if power == "UPS":
@@ -141,10 +139,12 @@ class LabMonitor(threading.Thread):
                     if percentage:     # Checking for None
                         if percentage <= 20 and self.low_battery == False:
                             self.log("Sending low battery message")
-                            msg = f"Alert\n\nBattery is less than 20%\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
+                            msg = f"Alert\n\nBattery is less than 20% on {utils.get_rdbl_time()}\n\nLocation: {self.config.location}"
                             self.sms_thread.enqueue_sms(self.config.numbers, msg)
                             file_utils.write_history("Low battery")
                             self.low_battery = True
+                        elif percentage > 20:
+                            self.low_battery = False
                     
                 # Run any scheduled daily status reports
                 schedule.run_pending()
@@ -217,8 +217,11 @@ class LabMonitor(threading.Thread):
         Sends daily report SMS to numbers who want daily report
         """
         if self.config.send_daily_report:
-            self.log("Sent daily status message")
-            msg = f"Daily Report\n\nLocation: {self.config.location}\nTime: {utils.get_rdbl_time()}"
+            self.log("Sending daily status report...")
+            sensor_details = "\n".join(
+                            [f"{self.config.sensors[key]['name']}: {self.readings[key]} C" for key in self.readings]
+                        )
+            msg = f"Daily Report\n\nLocation: {self.config.location}\n\nPower: {self.power_source}\n{sensor_details}\nTime: {utils.get_rdbl_time()}"
             self.sms_thread.enqueue_sms(self.config.daily_numbers, msg)
             file_utils.write_history("Daily report")
             
@@ -228,14 +231,12 @@ class LabMonitor(threading.Thread):
         """
         if self.debug:
             journal.send(message)
-            print(message)
             
-    def handle_sms(self, sms: gsmmodem.modem.ReceivedSms):
+    def handle_message(self, num, text):
         """
-        Replies to SMS by the users of the Monitor after Authenticating and Authorizing
+        Replies to SMS by the users of the Monitor after Authenticating and Authorizing, returns None if it cannot authenticate
         """
-        text = sms.text.lower().strip()
-        num = sms.number
+        text = text.lower()
         if num in self.config.numbers:  # Check if the message came from the list of numbers in the database
             name = ''
             for contact in self.config.numbers_list:        # Getting the name corresponding to the number
@@ -249,27 +250,21 @@ class LabMonitor(threading.Thread):
                 repeat_alerts = f"Alert Interval: {int(config['interval'])} minutes" if config['repeat_alerts'] else f"Repeat Alerts: {config['repeat_alerts']}"
                 
                 sensor_details = "\n".join(
-                            [f"{self.config.sensors[key]['name']}: {self.readings[key]}°C" for key in self.readings]
+                            [f"{self.config.sensors[key]['name']}: {self.readings[key]} C" for key in self.readings]
                         )
-                
-                message = f"Arm/Disarm: {armed}\nSignal Strength:{signal_strength}(0-4)\nPower: {config['power']}\n{sensor_details}\n{repeat_alerts}"
-                self.sms_thread.enqueue_sms([num], message)
                 file_utils.write_history(f"Status request by {name}")
-                return
+                return f"Arm/Disarm: {armed}\nSignal Strength: {signal_strength} (0-31)\nPower: {config['power']}\n{sensor_details}\n{repeat_alerts}"
+                
 
             if text == 'time':  # Same for admin and normal users
-                message = f"Time: {utils.get_rdbl_time()}"
-                self.sms_thread.enqueue_sms([num], message)
                 file_utils.write_history(f"Time request by {name}")
-                return
+                return f"Time: {utils.get_rdbl_time()}"
 
             if text == 'help':
-                admin_help = "1. status\n2. time\n3. set repeat-alerts [on/off]\n4. set alert-interval [value in minutes]"
+                admin_help = "1. status\n2. time\n3. set repeat-alerts (on/off)\n4. set alert-interval (value in minutes)"
                 normal_help = "1. status\n2. time"
-                help_message = admin_help if num in self.config.admins else normal_help   # Seperate for both
-                self.sms_thread.enqueue_sms([num], help_message)
                 file_utils.write_history(f"Help request by {name}")
-                return
+                return admin_help if num in self.config.admins else normal_help   # Seperate for both
 
             if num in self.config.admins:  # Additional commands for admin users
                 parts = text.split()
@@ -279,23 +274,28 @@ class LabMonitor(threading.Thread):
                         if status == 'on':
                             file_utils.update_config(repeat_alerts = True)  
                         else:
-                            file_utils.update_config(repeat_alerts = False)  
-                        self.sms_thread.enqueue_sms([num], f"Repeat-Alerts set to '{status}'.")
+                            file_utils.update_config(repeat_alerts = False)
+                        self.config.load_config()
                         file_utils.write_history(f"Repeat-Alerts set to '{status}' by {name}")
+                        return f"Repeat-Alerts set to '{status}'."
+                        
                         
                     elif parts[0] == 'set' and parts[1] == 'alert-interval' and utils.is_positive_number(parts[2]):
                         interval = int(parts[2])
                         file_utils.update_config(interval = interval) 
-                        self.sms_thread.enqueue_sms([num], f"Alert interval set to {interval} minutes")
-                        file_utils.write_history(f"Alert interval set to {interval} minutes by {name}")                       
+                        self.config.load_config()
+                        file_utils.write_history(f"Alert interval set to {interval} minutes by {name}")     
+                        return f"Alert interval set to {interval} minutes"
+                                          
                         
                     else:
-                        self.sms_thread.enqueue_sms([num], "Invalid value for repeat-alerts. Please enter 'on' or 'off'.")
                         file_utils.write_history(f"Invalid command sent by {name}")
-                    return 
-
-            self.sms_thread.enqueue_sms([num], "Invalid command. Send 'help' for more details.")
+                        return "Invalid command. Send 'help' for more details."
+                        
             file_utils.write_history(f"Invalid command sent by {name}")
+            return "Invalid command. Send 'help' for more details."
+        return None
+            
 
             
            

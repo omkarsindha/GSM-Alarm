@@ -56,7 +56,7 @@ class TemperatureSensor:
         with open(file, 'r') as f:
             lines = f.readlines()
             if len(lines) != 2:
-                raise ValueError("Not two lines" % file)
+                raise ValueError(f"Not two lines {file}")
             if 'YES' not in lines[0]:
                 raise ValueError('Bad CRC')
             _, t_equals, temp_string = lines[1].partition('t=')

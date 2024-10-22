@@ -16,7 +16,8 @@
                 {{ pi_time }}
             </div>
             <div class="icon">
-                <img src="{{ url_for('static', filename='imgs/signal-strength-' ~ signal_strength ~ '.svg') }}"
+                <span>{{ (signal_strength * 100 / 31 )| round_number}}%</span>
+                <img src="{{ url_for('static', filename='imgs/signal-strength-' ~ ('4' if signal_strength > 23 else ('3' if signal_strength  > 15 else ('2' if signal_strength  > 8 else  ('1' if signal_strength  > 0 else  '0')))) ~ '.svg') }}"
                     id="signal-strength" alt="Signal">
                 <span id="signal-type">{{ signal_type }}</span>
             </div>
@@ -82,7 +83,7 @@
                     </tr>
                     <tr>
                         <td>Daily report time:</td>
-                        <td>{{ daily_report_time if send_daily_report else 'N/A' }}</td>
+                        <td>{{ (daily_report_time | change_24h_to_12h) if send_daily_report else 'N/A' }}</td>
                     </tr>
                     <tr>
                         <td>Power Source:</td>

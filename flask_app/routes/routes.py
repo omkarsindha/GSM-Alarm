@@ -4,7 +4,7 @@ from monitor_instance import get_monitor
 from utils import file_utils
 from utils import utils
 import sys
-
+import time
     
 @app.route("/")
 def home():
@@ -76,3 +76,15 @@ def delete_number(index):
 @app.template_filter('format_phone_number')
 def format_phone_number(number):
     return f"{number[:2]} ({number[2:5]}) {number[5:8]}-{number[8:]}"
+
+@app.template_filter('change_24h_to_12h')
+def change_24h_to_12h(time_24h):
+    time_struct = time.strptime(time_24h, "%H:%M")
+    time_12hr = time.strftime("%I:%M %p", time_struct)
+
+    return time_12hr
+    
+    
+@app.template_filter('round_number')
+def round_number(number):
+    return round(number)
