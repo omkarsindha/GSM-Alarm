@@ -2,6 +2,8 @@ import os
 import glob
 import time
 import traceback
+from systemd import journal
+
 
 SENSOR_DIR = '/sys/bus/w1/devices/'
 
@@ -19,9 +21,10 @@ class TemperatureSensor:
     Support is provided through the sysfs 'w1_slave file'.
     This module will not work if w1-gpio and w1-therm are not loaded beforehand
     """
-    def __init__(self):
+    def __init__(self, debug=True):
         self.sensor_serials = self.discover_sensors()
-        self.warnings = []
+        self.warning = False       # Error flag when reading sensors 
+        self.debug = debug
         
     def discover_sensors(self):
         """
@@ -52,7 +55,7 @@ class TemperatureSensor:
         Will raise ValueError on invalid contents or bad CRC.
         On success returns the temperature in degress C (float).
         """
-        file = SENSOR_DIR+'28-'+serial+'/w1_slave'  # Converting the serial to the actual path
+        file = f'{SENSOR_DIR}28-'+serial+'/w1_slave'  # Converting the serial to the actual path
         with open(file, 'r') as f:
             lines = f.readlines()
             if len(lines) != 2:
@@ -67,11 +70,21 @@ class TemperatureSensor:
             else:
                 return round(temp_c,2)
 
+                         
+    def log(self, message: str) -> None:
+        """
+        Logs a message if debug mode is enabled.
+        
+        :param message: Message to log
+        """
+        if self.debug:
+            journal.send(message)
+            
     def get_readings(self) -> dict:
         """Returns a dictionary of sensor serial and their readings.
 
         Example: [{"xxxxxxxxx":25.23,...}]
-        If a sensor read files, will add a warning to self.warnings.
+        If there is a read error, will change warning to True.
         """
         readings = {}
         for serial in self.sensor_serials:
@@ -81,9 +94,9 @@ class TemperatureSensor:
                 # SysFS w1_slave invalid format or failed CRC.
                 error = str(err) if str(err) else str(err.__class__.__name__)
                 message = f"Error reading sensor with serial '{serial}': {error}"
-                self.warnings.append(message)
-                print(message)
-                print(traceback.format_exc())
+                self.warning = True
+                self.log(message)
+                self.log(traceback.format_exc())
             else:
                 readings[serial] = temp_c
         return readings

@@ -38,6 +38,7 @@ test the app thoroughly
 make more modular file utils 
 
 
+Note: After removing a sensor, the folder stays for another 2 mins before it is removed from os
 
 Problems I have had
 	1) Fan using the serial pins

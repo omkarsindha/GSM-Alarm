@@ -1,1 +1,4 @@
 Config/config.json
+**/__pycache__/
+test.txt
+SIM7600xold.py

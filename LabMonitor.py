@@ -1,6 +1,6 @@
 from Config.Config import Config
 from TemperatureSensor import TemperatureSensor
-from SIM7600xold import SIM7600x
+from SIM7600x import SIM7600x
 from UPS import UPS
 import time
 import os
@@ -10,9 +10,8 @@ import schedule
 import traceback
 from utils import file_utils
 from utils import utils
-import gsmmodem
 from systemd import journal
-from SIM7600xold import SMSMessage
+
 
 class LabMonitor(threading.Thread):
     """
@@ -65,6 +64,12 @@ class LabMonitor(threading.Thread):
         while not self.end_event.is_set():
             # Read current temperature and power status
             self.readings = self.sensor.get_readings()  # Dict of sensor serial and its temp {"xxx":xx, ...}
+            if self.sensor.warning:
+                self.log("Updating sensors.")
+                self.sensor.sensor_serials = self.discover_sensors()
+                file_utils.add_new_sensor(self.sensor.sensor_serials)
+                self.sensor.warning = False
+            
             power = self.ups.get_power_source()  # 120V-AC or UPS or None if error
 
             self.log(f"Status (Temperature Readings: {self.readings} || Power: {power})")
@@ -137,13 +142,14 @@ class LabMonitor(threading.Thread):
                 if power == "UPS":
                     percentage = self.ups.get_battery_level()
                     if percentage:     # Checking for None
-                        if percentage <= 20 and self.low_battery == False:
+                        low = 20
+                        if percentage <= low and self.low_battery == False:
                             self.log("Sending low battery message")
-                            msg = f"Alert\n\nBattery is less than 20% on {utils.get_rdbl_time()}\n\nLocation: {self.config.location}"
+                            msg = f"Alert\n\nBattery is less than {low}% on {utils.get_rdbl_time()}\n\nLocation: {self.config.location}"
                             self.sms_thread.enqueue_sms(self.config.numbers, msg)
                             file_utils.write_history("Low battery")
                             self.low_battery = True
-                        elif percentage > 20:
+                        elif percentage > low:
                             self.low_battery = False
                     
                 # Run any scheduled daily status reports
@@ -167,16 +173,12 @@ class LabMonitor(threading.Thread):
         signal_strength = self.sms_thread.signal_strength
         battery = self.ups.get_battery_level()
         battery = 0 if not battery else battery
-        # Config might have old sensors so filtering it to get only the ones available in the latest readings
-        sensor_serials = list(self.readings.keys())                               
-        filtered_sensors = {sensor_serial: info for sensor_serial, info in self.config.sensors.items() if sensor_serial in sensor_serials}
 
         # Initialize the intersection list
         intersection = []
-        for sensor_serial in self.readings:
-            temperature = self.readings[sensor_serial]
-            if sensor_serial in filtered_sensors:
-                sensor_info = filtered_sensors[sensor_serial]
+        for sensor_serial, temperature in self.readings.items():             # loops thru keys   
+            if sensor_serial in self.config.sensors:
+                sensor_info = self.config.sensors[sensor_serial]
                 combined_info = {
                     "name": sensor_info["name"],
                     "sensor": sensor_serial,
@@ -202,7 +204,7 @@ class LabMonitor(threading.Thread):
                 "battery": self.ups.get_battery_level(),
                 "sensors": intersection
                 }
-    
+ 
     def schedule_daily_status(self):
         """
         Schedules the daily report SMS
@@ -218,12 +220,12 @@ class LabMonitor(threading.Thread):
         """
         if self.config.send_daily_report:
             self.log("Sending daily status report...")
+            sorted_keys = sorted(self.readings, key=lambda k: self.config.sensors[k]['name'])
             sensor_details = "\n".join(
-                            [f"{self.config.sensors[key]['name']}: {self.readings[key]} C" for key in self.readings]
+                            [f"{self.config.sensors[key]['name']}: {self.readings[key]} C" for key in sorted_keys]
                         )
             msg = f"Daily Report\n\nLocation: {self.config.location}\n\nPower: {self.power_source}\n{sensor_details}\nTime: {utils.get_rdbl_time()}"
             self.sms_thread.enqueue_sms(self.config.daily_numbers, msg)
-            file_utils.write_history("Daily report")
             
     def log(self, message):
         """
@@ -297,9 +299,6 @@ class LabMonitor(threading.Thread):
         return None
             
 
-            
-           
-        
 if __name__ == "__main__":
     # Create and start a LabMonitor instance for testing
     monitor = LabMonitor(debug=True)

@@ -73,6 +73,11 @@ def delete_number(index):
     monitor.config.load_config()
     return redirect(url_for('settings'))
 
+@app.route('/clear_history')
+def clear_history():
+    file_utils.clear_history()
+    return redirect(url_for('history'))
+
 @app.template_filter('format_phone_number')
 def format_phone_number(number):
     return f"{number[:2]} ({number[2:5]}) {number[5:8]}-{number[8:]}"
@@ -83,8 +88,7 @@ def change_24h_to_12h(time_24h):
     time_12hr = time.strftime("%I:%M %p", time_struct)
 
     return time_12hr
-    
-    
+
 @app.template_filter('round_number')
 def round_number(number):
     return round(number)

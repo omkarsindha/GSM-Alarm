@@ -1,7 +1,0 @@
-repeat-alerts - pass :)
-daily report - pass :)
-armed - pass :)
-alert interval - 
-Trigger temp - 
-location - 
-add phone - 

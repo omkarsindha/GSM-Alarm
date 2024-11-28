@@ -133,11 +133,14 @@ def write_history(event, file_path="Config/events.json"):
     } 
     try:
         with open(file_path, "r") as file:
-            history_data = json.load(file)    
-        history_data.append(history)
-        with open(file_path, "w") as file:
-            json.dump(history_data, file, indent=4)
-    except (OSError, json.JSONDecodeError) as e:
+            try:
+                history_data = json.load(file)
+            except json.JSONDecodeError as e:
+                history_data = []
+            history_data.append(history)
+            with open(file_path, "w") as file:
+                json.dump(history_data, file, indent=4)
+    except OSError as e:
         print(f"Error writing to history file: {e}")   
 
 def get_history_data(file_path="Config/events.json") -> list[str]: 
@@ -151,7 +154,13 @@ def get_history_data(file_path="Config/events.json") -> list[str]:
         print(f"Error reading history data: {e}")
         return []
    
-    
+def clear_history(file_path="Config/events.json"):
+    try:
+        with open(file_path, "w") as file:
+            json.dump([], file, indent=4)
+    except OSError as e:
+        print(f"Error writing to history file: {e}")   
+        
 if __name__ == '__main__':
     print(get_data(file_path="Config/con.json"))
     print("HI")
