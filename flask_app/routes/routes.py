@@ -51,7 +51,14 @@ def update_sensor():
     file_utils.update_sensor_data(sensor, name, trigger)
     monitor = get_monitor()
     monitor.config.load_config()
-    print(f"Updated {sensor} {name } {trigger}")
+    return redirect(url_for('settings'))
+
+@app.route('/apply_trigger_all', methods=['POST'])
+def apply_trigger_all():
+    trigger = request.form['trigger']
+    file_utils.apply_trigger_all(trigger)
+    monitor = get_monitor()
+    monitor.config.load_config()
     return redirect(url_for('settings'))
 
 @app.route('/add-phone-number', methods=['POST'])

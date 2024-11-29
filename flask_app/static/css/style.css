@@ -299,3 +299,9 @@ input:checked+.slider:before {
 .entry {
     padding-bottom: 20px;
 }
+
+
+#apply-all-trigger {
+    max-width: 100px;
+    margin: 5px;
+}

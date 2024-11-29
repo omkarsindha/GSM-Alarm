@@ -126,6 +126,21 @@ def update_sensor_data(serial, name, trigger, file_path="Config/config.json"):
     else:
         print("Cannot update, could not find sensor in config")
 
+def apply_trigger_all(trigger, file_path="Config/config.json"):
+    """ Edit sensor name and trigger based on sensor serial. """
+    data = get_data(file_path)
+    sensor_config = data["sensors"]
+   
+    for serial, info in sensor_config.items():
+        info['trigger'] = int(trigger)
+
+    try:
+        with open(file_path, 'w') as file:
+            json.dump(data, file, indent=4)
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"Error updating sensor data: {e}")
+
+        
 def write_history(event, file_path="Config/events.json"):
     history = {
         "event": event,
@@ -160,6 +175,7 @@ def clear_history(file_path="Config/events.json"):
             json.dump([], file, indent=4)
     except OSError as e:
         print(f"Error writing to history file: {e}")   
+        
         
 if __name__ == '__main__':
     print(get_data(file_path="Config/con.json"))

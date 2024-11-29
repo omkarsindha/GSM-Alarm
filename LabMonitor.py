@@ -224,7 +224,7 @@ class LabMonitor(threading.Thread):
             sensor_details = "\n".join(
                             [f"{self.config.sensors[key]['name']}: {self.readings[key]} C" for key in sorted_keys]
                         )
-            msg = f"Daily Report\n\nLocation: {self.config.location}\n\nPower: {self.power_source}\n{sensor_details}\nTime: {utils.get_rdbl_time()}"
+            msg = f"Daily Report\nLocation: {self.config.location}\n\n{sensor_details}\n\nPower: {self.power_source}\nTime: {utils.get_rdbl_time()}"
             self.sms_thread.enqueue_sms(self.config.daily_numbers, msg)
             
     def log(self, message):
@@ -255,7 +255,7 @@ class LabMonitor(threading.Thread):
                             [f"{self.config.sensors[key]['name']}: {self.readings[key]} C" for key in self.readings]
                         )
                 file_utils.write_history(f"Status request by {name}")
-                return f"Arm/Disarm: {armed}\nSignal Strength: {signal_strength} (0-31)\nPower: {config['power']}\n{sensor_details}\n{repeat_alerts}"
+                return f"Arm/Disarm: {armed}\nSignal Strength: {signal_strength} (0-31)\nPower: {config['power']}\n{repeat_alerts}\n\n{sensor_details}"
                 
 
             if text == 'time':  # Same for admin and normal users

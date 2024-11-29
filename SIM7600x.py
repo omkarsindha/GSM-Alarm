@@ -230,17 +230,19 @@ class SIM7600x(threading.Thread):
         :return: Interpreted signal strength (0-4) (0 Means Error reading signal strength)
         """
         try:
-            if "+CSQ:" in csq_output:
-                csq_output = csq_output.split("OK")[0].strip()
-                rssi = int(csq_output.split(":")[1].split(",")[0].strip())
-                if rssi == 99:
-                    return 0
-                elif 0 <= rssi <= 31:
-                    return rssi
-                else:
-                    return 0
-            else:
-                return 0
+            csq_output_lines = csq_output.splitlines()
+            for line in csq_output_lines:
+                line = line.strip()
+                if "+CSQ:" in line:
+                    parts = line.split()
+                    rssi = int(parts[1].split(",")[0])
+                    if rssi == 99:
+                        return 0
+                    elif 0 <= rssi <= 31:
+                        return rssi
+                    else:
+                        return 0
+            return 0
         except Exception as e:
             self.log(f"Error while interpreting signal strength: {e}")
             return 0
