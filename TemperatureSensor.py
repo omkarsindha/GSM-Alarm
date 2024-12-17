@@ -56,19 +56,22 @@ class TemperatureSensor:
         On success returns the temperature in degress C (float).
         """
         file = f'{SENSOR_DIR}28-'+serial+'/w1_slave'  # Converting the serial to the actual path
-        with open(file, 'r') as f:
-            lines = f.readlines()
-            if len(lines) != 2:
-                raise ValueError(f"Not two lines {file}")
-            if 'YES' not in lines[0]:
-                raise ValueError('Bad CRC')
-            _, t_equals, temp_string = lines[1].partition('t=')
-            try:
-                temp_c = float(temp_string) / 1000.0
-            except ValueError:
-                raise ValueError(f"Bad temperature '{lines[1]}'")
-            else:
-                return round(temp_c,2)
+        try:
+            with open(file, "r") as f:
+                lines = f.readlines()
+                if len(lines) != 2:
+                    raise ValueError(f"Not two lines in {file}")
+                # Parse temperature from lines[1]
+                temp_data = lines[1].split("t=")
+                if len(temp_data) == 2:
+                    temp_c = int(temp_data[1]) / 1000.0
+                    return round(temp_c,1)
+                else:
+                    raise ValueError("Invalid temperature data format.")
+        except FileNotFoundError:
+            raise ValueError(f"Sensor file not found: {file}")
+        except Exception as e:
+            raise ValueError(f"Error reading sensor {serial}: {e}")
 
                          
     def log(self, message: str) -> None:

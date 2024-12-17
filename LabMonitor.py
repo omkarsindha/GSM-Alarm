@@ -64,9 +64,14 @@ class LabMonitor(threading.Thread):
         while not self.end_event.is_set():
             # Read current temperature and power status
             self.readings = self.sensor.get_readings()  # Dict of sensor serial and its temp {"xxx":xx, ...}
+            if not self.readings:
+                self.log("No sensor readings available. Retrying discovery...")
+                self.sensor.sensor_serials = self.sensor.discover_sensors()
+
+
             if self.sensor.warning:
                 self.log("Updating sensors.")
-                self.sensor.sensor_serials = self.discover_sensors()
+                self.sensor.sensor_serials = self.sensor.discover_sensors()
                 file_utils.add_new_sensor(self.sensor.sensor_serials)
                 self.sensor.warning = False
             
