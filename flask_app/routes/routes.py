@@ -43,6 +43,22 @@ def configure_alarm():
     monitor.schedule_daily_status()
     return redirect(url_for('settings'))
 
+@app.route("/get_sensor_data", methods=['GET'])
+def insite_poll():
+    monitor = get_monitor()
+    config = monitor.get_config()
+    sensors = []
+    for index, sensor in enumerate(config['sensors']):
+        item = {
+            "Index": index,
+            "Serial": sensor["sensor"], # this is the sensor serial
+            "Name": sensor["name"],
+            "Temperature": sensor["temperature"],
+            "Temperature_Maximum": sensor["trigger"]
+        }
+        sensors.append(item)
+    return jsonify(sensors)
+
 @app.route('/update_sensor', methods=['POST'])
 def update_sensor():
     sensor = request.form['sensor']
